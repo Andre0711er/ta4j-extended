@@ -5,9 +5,9 @@ import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.MMAIndicator;
 import org.ta4j.core.indicators.helpers.ChangeIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.ConstantIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
+import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -30,8 +30,8 @@ public class RMIIndicator extends CachedIndicator<Num> {
         ChangeIndicator momentum = new ChangeIndicator(indicator, barCountMomentum);
         ConstantIndicator<Num> zero = new ConstantIndicator<>(indicator.getBarSeries(),
                 getBarSeries().numFactory().zero());
-        this.up = new MMAIndicator(CombineIndicator.max(momentum, zero), barCount);
-        this.down = new MMAIndicator(TransformIndicator.abs(CombineIndicator.min(momentum, zero)), barCount);
+        this.up = new MMAIndicator(BinaryOperationIndicator.max(momentum, zero), barCount);
+        this.down = new MMAIndicator(UnaryOperationIndicator.abs(BinaryOperationIndicator.min(momentum, zero)), barCount);
         this.unstableBars = Math.max(barCount, barCountMomentum);
     }
 

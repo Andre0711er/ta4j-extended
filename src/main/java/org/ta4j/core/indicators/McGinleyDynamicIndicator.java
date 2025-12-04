@@ -21,7 +21,7 @@ public class McGinleyDynamicIndicator extends CachedIndicator<Num> {
     }
 
     @Override protected Num calculate(int index) {
-        if (index < barCount) {
+        if (index <= barCount) {
             return emaIndicator.getValue(index);
         }
 

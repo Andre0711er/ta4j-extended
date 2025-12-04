@@ -4,13 +4,9 @@ import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.SMAIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.HighPriceIndicator;
-import org.ta4j.core.indicators.helpers.HighestValueIndicator;
-import org.ta4j.core.indicators.helpers.LowPriceIndicator;
-import org.ta4j.core.indicators.helpers.LowestValueIndicator;
-import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.helpers.*;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
+import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -47,13 +43,13 @@ public class FantailVMAIndicator extends AbstractIndicator<Num> {
             LowPriceIndicator lowPrice = new LowPriceIndicator(series);
             PreviousValueIndicator previousHighPrice = new PreviousValueIndicator(highPrice);
             PreviousValueIndicator previousLowPrice = new PreviousValueIndicator(lowPrice);
-            CombineIndicator highPriceChange = CombineIndicator.minus(highPrice, previousHighPrice);
-            CombineIndicator lowPriceChange = CombineIndicator.minus(previousLowPrice, lowPrice);
+            BinaryOperationIndicator highPriceChange = BinaryOperationIndicator.difference(highPrice, previousHighPrice);
+            BinaryOperationIndicator lowPriceChange = BinaryOperationIndicator.difference(previousLowPrice, lowPrice);
 
-            TransformIndicator bulls1 = TransformIndicator.divide(
-                    CombineIndicator.plus(TransformIndicator.abs(highPriceChange), highPriceChange), 2);
-            TransformIndicator bears1 = TransformIndicator.divide(
-                    CombineIndicator.plus(TransformIndicator.abs(lowPriceChange), lowPriceChange), 2);
+            BinaryOperationIndicator bulls1 = BinaryOperationIndicator.quotient(
+                    BinaryOperationIndicator.sum(UnaryOperationIndicator.abs(highPriceChange), highPriceChange), 2);
+            BinaryOperationIndicator bears1 = BinaryOperationIndicator.quotient(
+                    BinaryOperationIndicator.sum(UnaryOperationIndicator.abs(lowPriceChange), lowPriceChange), 2);
 
             SPDIIndicator sPDI = new SPDIIndicator(bulls1, bears1, weighting);
             SMDIIndicator sMDI = new SMDIIndicator(bulls1, bears1, weighting);
@@ -62,7 +58,7 @@ public class FantailVMAIndicator extends AbstractIndicator<Num> {
             this.adx = new ADXIndicator(sPDI, sMDI, sTR, weighting);
             HighestValueIndicator adxHigh = new HighestValueIndicator(adx, adxLength);
             this.adxLow = new LowestValueIndicator(adx, adxLength);
-            this.diff = CombineIndicator.minus(adxHigh, adxLow);
+            this.diff = BinaryOperationIndicator.difference(adxHigh, adxLow);
         }
 
         @Override
@@ -105,8 +101,8 @@ public class FantailVMAIndicator extends AbstractIndicator<Num> {
             }
 
             Num bullsValue = bulls1.getValue(index).isLessThanOrEqual(bears1.getValue(index))
-                             ? getBarSeries().numFactory().zero()
-                             : bulls1.getValue(index);
+                    ? getBarSeries().numFactory().zero()
+                    : bulls1.getValue(index);
             return getValue(index - 1).multipliedBy(weighting).plus(bullsValue).dividedBy(
                     weighting.plus(getBarSeries().numFactory().one()));
         }
@@ -136,8 +132,8 @@ public class FantailVMAIndicator extends AbstractIndicator<Num> {
             }
 
             Num bearsValue = bulls1.getValue(index).isGreaterThanOrEqual(bears1.getValue(index))
-                             ? getBarSeries().numFactory().zero()
-                             : bears1.getValue(index);
+                    ? getBarSeries().numFactory().zero()
+                    : bears1.getValue(index);
             return getValue(index - 1).multipliedBy(weighting).plus(bearsValue).dividedBy(
                     weighting.plus(getBarSeries().numFactory().one()));
         }
@@ -200,14 +196,14 @@ public class FantailVMAIndicator extends AbstractIndicator<Num> {
 
             Num sTRValue = sTR.getValue(index);
             Num pdi = sTRValue.isPositive()
-                      ? sPDI.getValue(index).dividedBy(sTRValue)
-                      : getBarSeries().numFactory().zero();
+                    ? sPDI.getValue(index).dividedBy(sTRValue)
+                    : getBarSeries().numFactory().zero();
             Num mdi = sTRValue.isPositive()
-                      ? sMDI.getValue(index).dividedBy(sTRValue)
-                      : getBarSeries().numFactory().zero();
+                    ? sMDI.getValue(index).dividedBy(sTRValue)
+                    : getBarSeries().numFactory().zero();
             Num dx = pdi.plus(mdi).isPositive()
-                     ? pdi.minus(mdi).abs().dividedBy(pdi.plus(mdi))
-                     : getBarSeries().numFactory().zero();
+                    ? pdi.minus(mdi).abs().dividedBy(pdi.plus(mdi))
+                    : getBarSeries().numFactory().zero();
             return getValue(index - 1).multipliedBy(weighting).plus(dx).dividedBy(
                     weighting.plus(getBarSeries().numFactory().one()));
         }

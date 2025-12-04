@@ -5,9 +5,8 @@ import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.AbstractIndicator;
 import org.ta4j.core.indicators.averages.EMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -27,9 +26,9 @@ public class WAETrendIndicator extends AbstractIndicator<Num> {
 
         EMAIndicator fastMA = new EMAIndicator(indicator, fastLength);
         EMAIndicator slowMA = new EMAIndicator(indicator, slowLength);
-        CombineIndicator macd = CombineIndicator.minus(fastMA, slowMA);
+        BinaryOperationIndicator macd = BinaryOperationIndicator.difference(fastMA, slowMA);
         PreviousValueIndicator macdPrev = new PreviousValueIndicator(macd);
-        this.trendIndicator = TransformIndicator.multiply(CombineIndicator.minus(macd, macdPrev), sensitivity);
+        this.trendIndicator = BinaryOperationIndicator.product(BinaryOperationIndicator.difference(macd, macdPrev), sensitivity);
         this.unstableBars = Math.max(fastLength, slowLength);
     }
 

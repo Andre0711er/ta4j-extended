@@ -7,14 +7,8 @@ import org.ta4j.core.indicators.averages.SMAIndicator;
 import org.ta4j.core.indicators.bollinger.BollingerBandsLowerIndicator;
 import org.ta4j.core.indicators.bollinger.BollingerBandsMiddleIndicator;
 import org.ta4j.core.indicators.bollinger.BollingerBandsUpperIndicator;
-import org.ta4j.core.indicators.helpers.AverageIndicator;
-import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.HighPriceIndicator;
-import org.ta4j.core.indicators.helpers.HighestValueIndicator;
-import org.ta4j.core.indicators.helpers.LowPriceIndicator;
-import org.ta4j.core.indicators.helpers.LowestValueIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.helpers.*;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.indicators.statistics.SimpleLinearRegressionIndicator;
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator;
 import org.ta4j.core.num.Num;
@@ -49,14 +43,14 @@ public class SqueezeMomentumIndicator extends AbstractIndicator<Num> {
         this.lowerBB = new BollingerBandsLowerIndicator(middleBB, standardDev, numFactory.numOf(bbMultFactor));
 
         Indicator<Num> ma = new SMAIndicator(indicator, kcLength);
-        Indicator<Num> range = TransformIndicator.multiply(new ATRIndicatorPlus(series, kcLength, Input.SMA), kcMultFactor);
-        this.upperKC = CombineIndicator.plus(ma, range);
-        this.lowerKC = CombineIndicator.minus(ma, range);
+        Indicator<Num> range = BinaryOperationIndicator.product(new ATRIndicatorPlus(series, kcLength, Input.SMA), kcMultFactor);
+        this.upperKC = BinaryOperationIndicator.sum(ma, range);
+        this.lowerKC = BinaryOperationIndicator.difference(ma, range);
 
         HighestValueIndicator highestHigh = new HighestValueIndicator(new HighPriceIndicator(series), kcLength);
         LowestValueIndicator lowestLow = new LowestValueIndicator(new LowPriceIndicator(series), kcLength);
         Indicator<Num> averageIndicator = new AverageIndicator(highestHigh, lowestLow, ma);
-        this.squeezeMomentumIndicator = new SimpleLinearRegressionIndicator(CombineIndicator.minus(indicator, averageIndicator), kcLength);
+        this.squeezeMomentumIndicator = new SimpleLinearRegressionIndicator(BinaryOperationIndicator.difference(indicator, averageIndicator), kcLength);
         this.unstableBars = Math.max(bbLength, kcLength);
     }
 

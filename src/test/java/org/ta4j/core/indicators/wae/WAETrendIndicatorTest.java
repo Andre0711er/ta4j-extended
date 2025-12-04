@@ -18,7 +18,7 @@ public class WAETrendIndicatorTest extends AbstractIndicatorTest<Indicator<Num>,
         super(numFactory);
     }
 
-    private Duration duration = Duration.ofDays(1);
+    private final Duration duration = Duration.ofDays(1);
     private BarSeries data;
 
     @Before
@@ -30,8 +30,8 @@ public class WAETrendIndicatorTest extends AbstractIndicatorTest<Indicator<Num>,
     public void test() {
         final var indicator = new WAETrendIndicator(data, 150, 20, 40);
 
-        assertNumEquals(9170.115875222837, indicator.getValue(data.getBarCount() - 3));
-        assertNumEquals(15048.79295704377, indicator.getValue(data.getBarCount() - 2));
-        assertNumEquals(8970.633312213613, indicator.getValue(data.getEndIndex()));
+        assertNumEquals(9170.116403274005, indicator.getValue(data.getBarCount() - 3));
+        assertNumEquals(15048.793459335866, indicator.getValue(data.getBarCount() - 2));
+        assertNumEquals(8970.633790003922, indicator.getValue(data.getEndIndex()));
     }
 }

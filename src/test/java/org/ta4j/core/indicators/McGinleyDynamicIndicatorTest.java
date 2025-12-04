@@ -18,7 +18,7 @@ public class McGinleyDynamicIndicatorTest extends AbstractIndicatorTest<Indicato
         super(numFactory);
     }
 
-    private Duration duration = Duration.ofDays(1);
+    private final Duration duration = Duration.ofDays(1);
     private BarSeries data;
 
     @Before

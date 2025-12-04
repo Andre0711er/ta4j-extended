@@ -2,8 +2,7 @@ package org.ta4j.core.indicators;
 
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.EMAIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -20,14 +19,15 @@ public class SRSIIndicator extends CachedIndicator<Num> {
         super(indicator);
 
         Indicator<Num> r1 = new EMAIndicator(indicator, barCount);
-        Indicator<Num> r2 = TransformIndicator.max(CombineIndicator.minus(indicator, r1), 0);
-        Indicator<Num> r3 = TransformIndicator.max(CombineIndicator.minus(r1, indicator), 0);
+        Indicator<Num> r2 = BinaryOperationIndicator.max(BinaryOperationIndicator.difference(indicator, r1), 0);
+        Indicator<Num> r3 = BinaryOperationIndicator.max(BinaryOperationIndicator.difference(r1, indicator), 0);
         this.r4 = new SMMAIndicator(r2, smoothing);
         this.r5 = new SMMAIndicator(r3, smoothing);
         this.unstableBars = Math.max(barCount, smoothing);
     }
 
-    @Override protected Num calculate(int index) {
+    @Override
+    protected Num calculate(int index) {
         NumFactory numFactory = getBarSeries().numFactory();
 
         if (r5.getValue(index).isZero()) {
@@ -38,7 +38,8 @@ public class SRSIIndicator extends CachedIndicator<Num> {
                 .dividedBy(numFactory.one().plus(r4.getValue(index).dividedBy(r5.getValue(index)))));
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return unstableBars;
     }
 }

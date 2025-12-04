@@ -5,8 +5,8 @@ import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.EMAIndicator;
 import org.ta4j.core.indicators.helpers.ChangeIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
+import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -28,18 +28,20 @@ public class TSIIndicator extends AbstractIndicator<Num> {
         EMAIndicator priceChangeDoubleSmoothed = new EMAIndicator(new EMAIndicator(priceChange, longLength),
                 shortLength);
         EMAIndicator priceChangeAbsDoubleSmoothed = new EMAIndicator(
-                new EMAIndicator(TransformIndicator.abs(priceChange), longLength), shortLength);
+                new EMAIndicator(UnaryOperationIndicator.abs(priceChange), longLength), shortLength);
 
-        this.tsiIndicator = TransformIndicator.multiply(
-                CombineIndicator.divide(priceChangeDoubleSmoothed, priceChangeAbsDoubleSmoothed), 100);
+        this.tsiIndicator = BinaryOperationIndicator.product(
+                BinaryOperationIndicator.quotient(priceChangeDoubleSmoothed, priceChangeAbsDoubleSmoothed), 100);
         this.unstableBars = Math.max(longLength, shortLength);
     }
 
-    @Override public Num getValue(int index) {
+    @Override
+    public Num getValue(int index) {
         return tsiIndicator.getValue(index);
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return unstableBars;
     }
 }

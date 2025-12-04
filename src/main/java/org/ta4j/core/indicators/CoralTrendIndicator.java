@@ -3,8 +3,7 @@ package org.ta4j.core.indicators;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -35,12 +34,12 @@ public class CoralTrendIndicator extends AbstractIndicator<Num> {
         IIndicator i5 = new IIndicator(i4, c1, c2);
         IIndicator i6 = new IIndicator(i5, c1, c2);
 
-        TransformIndicator addend1 = TransformIndicator.multiply(i6, -constantD * constantD * constantD);
-        TransformIndicator addend2 = TransformIndicator.multiply(i5, c3);
-        TransformIndicator addend3 = TransformIndicator.multiply(i4, c4);
-        TransformIndicator addend4 = TransformIndicator.multiply(i3, c5);
+        BinaryOperationIndicator addend1 = BinaryOperationIndicator.product(i6, -constantD * constantD * constantD);
+        BinaryOperationIndicator addend2 = BinaryOperationIndicator.product(i5, c3);
+        BinaryOperationIndicator addend3 = BinaryOperationIndicator.product(i4, c4);
+        BinaryOperationIndicator addend4 = BinaryOperationIndicator.product(i3, c5);
 
-        this.coralTrendIndicator = CombineIndicator.plus(CombineIndicator.plus(CombineIndicator.plus(addend1, addend2), addend3), addend4);
+        this.coralTrendIndicator = BinaryOperationIndicator.sum(BinaryOperationIndicator.sum(BinaryOperationIndicator.sum(addend1, addend2), addend3), addend4);
         this.smoothingPeriod = smoothingPeriod;
     }
 
@@ -55,13 +54,13 @@ public class CoralTrendIndicator extends AbstractIndicator<Num> {
     }
 
     private static class IIndicator extends CachedIndicator<Num> {
-        private final TransformIndicator addend1;
+        private final BinaryOperationIndicator addend1;
         private final Num c2;
 
         private IIndicator(Indicator<Num> indicator, double c1, double c2) {
             super(indicator);
 
-            this.addend1 = TransformIndicator.multiply(indicator, c1);
+            this.addend1 = BinaryOperationIndicator.product(indicator, c1);
             this.c2 = indicator.getBarSeries().numFactory().numOf(c2);
         }
 

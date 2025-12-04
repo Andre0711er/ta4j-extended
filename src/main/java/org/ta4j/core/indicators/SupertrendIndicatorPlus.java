@@ -4,9 +4,8 @@ import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.ATRIndicatorPlus.Input;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -40,14 +39,15 @@ public class SupertrendIndicatorPlus extends CachedIndicator<Num> {
             this.closePriceIndicator = new ClosePriceIndicator(indicator.getBarSeries());
         }
 
-        TransformIndicator atrIndicatorMultiplied = TransformIndicator.multiply(
+        BinaryOperationIndicator atrIndicatorMultiplied = BinaryOperationIndicator.product(
                 new ATRIndicatorPlus(indicator.getBarSeries(), barCount, atrInput), factor);
-        this.upperAtrBandIndicator = CombineIndicator.plus(indicator, atrIndicatorMultiplied);
-        this.lowerAtrBandIndicator = CombineIndicator.minus(indicator, atrIndicatorMultiplied);
+        this.upperAtrBandIndicator = BinaryOperationIndicator.sum(indicator, atrIndicatorMultiplied);
+        this.lowerAtrBandIndicator = BinaryOperationIndicator.difference(indicator, atrIndicatorMultiplied);
         this.barCount = barCount;
     }
 
-    @Override protected Num calculate(int index) {
+    @Override
+    protected Num calculate(int index) {
         if (index == 0) {
             // Assume the bar series starts in an uptrend
             // The value is anyway not valid before the first trend reversal
@@ -71,7 +71,8 @@ public class SupertrendIndicatorPlus extends CachedIndicator<Num> {
         }
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return barCount;
     }
 }

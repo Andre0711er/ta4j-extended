@@ -6,13 +6,13 @@ import org.ta4j.core.indicators.AbstractIndicator;
 import org.ta4j.core.indicators.CachedIndicator;
 import org.ta4j.core.indicators.averages.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.NzIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
 import org.ta4j.core.indicators.helpers.RunningTotalIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
 import org.ta4j.core.indicators.helpers.TypicalPriceIndicator;
 import org.ta4j.core.indicators.helpers.VolumeIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
+import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator;
 import org.ta4j.core.num.Num;
 
@@ -23,7 +23,6 @@ import org.ta4j.core.num.Num;
  */
 public class VolumeFlowIndicator extends AbstractIndicator<Num> {
     private final Indicator<Num> volumeFlowIndicator;
-    private final int barCount;
 
     public VolumeFlowIndicator(BarSeries series, int barCount, double coef, double vcoef) {
         this(new TypicalPriceIndicator(series), barCount, coef, vcoef);
@@ -32,22 +31,21 @@ public class VolumeFlowIndicator extends AbstractIndicator<Num> {
     public VolumeFlowIndicator(Indicator<Num> indicator, int barCount, double coef, double vcoef) {
         super(indicator.getBarSeries());
 
-        TransformIndicator log = TransformIndicator.log(indicator);
+        UnaryOperationIndicator log = UnaryOperationIndicator.log(indicator);
         NzIndicator prevLog = new NzIndicator(new PreviousValueIndicator(log));
-        CombineIndicator inter = CombineIndicator.minus(log, prevLog);
+        BinaryOperationIndicator inter = BinaryOperationIndicator.difference(log, prevLog);
         StandardDeviationIndicator vinter = new StandardDeviationIndicator(inter, 30);
-        TransformIndicator cutoff = TransformIndicator.multiply(
-                CombineIndicator.multiply(vinter, new ClosePriceIndicator(indicator.getBarSeries())), coef);
+        BinaryOperationIndicator cutoff = BinaryOperationIndicator.product(
+                BinaryOperationIndicator.product(vinter, new ClosePriceIndicator(indicator.getBarSeries())), coef);
         VolumeIndicator volumeIndicator = new VolumeIndicator(indicator.getBarSeries());
         NzIndicator vave = new NzIndicator(new PreviousValueIndicator(new SMAIndicator(volumeIndicator, barCount)));
-        TransformIndicator vmax = TransformIndicator.multiply(vave, vcoef);
-        CombineIndicator vc = CombineIndicator.min(volumeIndicator, vmax);
+        BinaryOperationIndicator vmax = BinaryOperationIndicator.product(vave, vcoef);
+        BinaryOperationIndicator vc = BinaryOperationIndicator.min(volumeIndicator, vmax);
         NzIndicator prevIndicator = new NzIndicator(new PreviousValueIndicator(indicator));
-        CombineIndicator mf = CombineIndicator.minus(indicator, prevIndicator);
+        BinaryOperationIndicator mf = BinaryOperationIndicator.difference(indicator, prevIndicator);
         VPCIndicator vcp = new VPCIndicator(mf, cutoff, vc);
         RunningTotalIndicator sum = new RunningTotalIndicator(vcp, barCount);
-        this.volumeFlowIndicator = CombineIndicator.divide(sum, vave);
-        this.barCount = barCount;
+        this.volumeFlowIndicator = BinaryOperationIndicator.quotient(sum, vave);
     }
 
     @Override
@@ -72,9 +70,9 @@ public class VolumeFlowIndicator extends AbstractIndicator<Num> {
 
             this.mf = mf;
             this.cutoff = cutoff;
-            this.cutoffNeg = TransformIndicator.multiply(cutoff, -1);
+            this.cutoffNeg = BinaryOperationIndicator.product(cutoff, -1);
             this.vc = vc;
-            this.vcNeg = TransformIndicator.multiply(vc, -1);
+            this.vcNeg = BinaryOperationIndicator.product(vc, -1);
         }
 
         @Override

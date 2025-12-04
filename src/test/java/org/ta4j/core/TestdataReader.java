@@ -1,19 +1,20 @@
 package org.ta4j.core;
 
+import org.ta4j.core.num.NumFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import org.ta4j.core.num.NumFactory;
 
 public class TestdataReader {
 
     private static NumFactory numFactory;
 
     public TestdataReader(NumFactory numFactory) {
-        this.numFactory = numFactory;
+        TestdataReader.numFactory = numFactory;
     }
 
     public BarSeries readCsv(String filename, Duration duration) throws IOException {
@@ -31,6 +32,7 @@ public class TestdataReader {
                     continue;
                 }
                 String[] values = line.split(",");
+                Instant beginTime = Instant.parse(values[1]);
                 Instant endTime = Instant.parse(values[2]);
                 double open = Double.parseDouble(values[4]);
                 double high = Double.parseDouble(values[5]);
@@ -38,7 +40,7 @@ public class TestdataReader {
                 double close = Double.parseDouble(values[7]);
                 double volume = Double.parseDouble(values[8]);
 
-                series.addBar(new BaseBar(duration, endTime, numFactory.numOf(open), numFactory.numOf(high),
+                series.addBar(new BaseBar(duration, beginTime, endTime, numFactory.numOf(open), numFactory.numOf(high),
                         numFactory.numOf(low), numFactory.numOf(close), numFactory.numOf(volume), numFactory.zero(),
                         0));
             }

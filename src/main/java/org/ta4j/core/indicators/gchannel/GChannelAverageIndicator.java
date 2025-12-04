@@ -2,8 +2,7 @@ package org.ta4j.core.indicators.gchannel;
 
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.AbstractIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -15,9 +14,9 @@ public class GChannelAverageIndicator extends AbstractIndicator<Num> {
     private final int unstableBars;
 
     GChannelAverageIndicator(GChannelUpperBandIndicator upperBandIndicator,
-            GChannelLowerBandIndicator lowerBandIndicator) {
+                             GChannelLowerBandIndicator lowerBandIndicator) {
         super(upperBandIndicator.getBarSeries());
-        this.averageIndicator = TransformIndicator.divide(CombineIndicator.plus(upperBandIndicator, lowerBandIndicator),
+        this.averageIndicator = BinaryOperationIndicator.quotient(BinaryOperationIndicator.sum(upperBandIndicator, lowerBandIndicator),
                 2);
         this.unstableBars = Math.max(upperBandIndicator.getCountOfUnstableBars(),
                 lowerBandIndicator.getCountOfUnstableBars());
@@ -39,11 +38,13 @@ public class GChannelAverageIndicator extends AbstractIndicator<Num> {
         return false;
     }
 
-    @Override public Num getValue(int index) {
+    @Override
+    public Num getValue(int index) {
         return averageIndicator.getValue(index);
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return unstableBars;
     }
 }

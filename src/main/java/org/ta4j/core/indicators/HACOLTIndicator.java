@@ -6,18 +6,9 @@ import org.ta4j.core.indicators.averages.EMAIndicator;
 import org.ta4j.core.indicators.averages.TripleEMAIndicator;
 import org.ta4j.core.indicators.candles.RealBodyIndicator;
 import org.ta4j.core.indicators.candles.RealRangeIndicator;
-import org.ta4j.core.indicators.helpers.BooleanCombineIndicator;
-import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.HighPriceIndicator;
-import org.ta4j.core.indicators.helpers.LogicIndicator;
-import org.ta4j.core.indicators.helpers.LowPriceIndicator;
-import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
-import org.ta4j.core.indicators.helpers.OHLC4PriceIndicator;
-import org.ta4j.core.indicators.helpers.OpenPriceIndicator;
-import org.ta4j.core.indicators.helpers.PreviousBooleanValueIndicator;
-import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.helpers.*;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
+import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -25,21 +16,21 @@ import org.ta4j.core.num.NumFactory;
  * Heikin Ashi Candles Oscillator Long Term (HACOLT) indicator by LazyBear. <a
  * href="https://www.tradingview.com/script/4zuhGaAU-Vervoort-Heiken-Ashi-LongTerm-Candlestick-Oscillator-LazyBear/">
  * TradingView</a>
- *
+ * <p>
  * TODO: The implementation is buggy, the values differ from TradingView
- *
+ * <p>
  * Original PineScript implementation:
- *
+ * <p>
  * length = input(defval=55, title="TEMA Period")
  * emaLength = input(defval=60, title="EMA Period")
  * candleSizeFactor = input(defval=1.1, title="Candle size factor")
- *
+ * <p>
  * calc_tema(src, length) =>
  * ema1 = ema(src, length)
  * ema2 = ema(ema1, length)
  * ema3 = ema(ema2, length)
  * 3 * (ema1 - ema2) + ema3
- *
+ * <p>
  * haOpen = nz((haOpen[1] + ohlc4) / 2, ohlc4)
  * haClose = (haOpen + max(high, haOpen) + min(low, haOpen) + ohlc4) / 4
  * thaClose = calc_tema(haClose, length)
@@ -59,34 +50,34 @@ import org.ta4j.core.num.NumFactory;
  * upw = dtr == 0 and dtr[1] and utr
  * dnw = utr == 0 and utr[1] and dtr
  * upwWithOffset = upw != dnw ? upw : nz(upwWithOffset[1])
- *
+ * <p>
  * buySig = upw or (not dnw and (na(upwWithOffset) ? 0 : upwWithOffset))
  * ltSellSig = close < ema(close, emaLength)
  * neutralSig = buySig or (ltSellSig ? 0 : nz(neutralSig[1]))
  * hacolt = buySig ? 1 : neutralSig ? 0 : -1
- *
+ * <p>
  * Cleaned up PineScript v6 implementation:
- *
+ * <p>
  * //@version=6
  * indicator("HACOLT", shorttitle = "HACOLT", overlay = false)
- *
+ * <p>
  * import TradingView/ta/9
- *
+ * <p>
  * length = input.int(55, title = "TEMA Period")
  * emaLength = input.int(60, title = "EMA Period")
  * candleSizeFactor = input.float(1.1, title = "Candle size factor")
- *
+ * <p>
  * var float haOpen = na
  * haOpen := na(haOpen[1]) ? ohlc4 : (haOpen[1] + ohlc4) / 2
  * haClose = (haOpen + math.max(high, haOpen) + math.min(low, haOpen) + ohlc4) / 4
- *
+ * <p>
  * thl2 = ta.tema(hl2, length)
  * thaClose = ta.tema(haClose, length)
  * hl2Smooth = 2 * thl2 - ta.tema(thl2, length)
  * haCloseSmooth = 2 * thaClose - ta.tema(thaClose, length)
- *
+ * <p>
  * shortCandle = math.abs(close - open) < ((high - low) * candleSizeFactor)
- *
+ * <p>
  * keepn1 = (haClose >= haOpen) and (haClose[1] >= haOpen[1]) or (close >= haClose) or (high > high[1]) or (low >
  * low[1]) or (hl2Smooth >= haCloseSmooth)
  * keepall1 = keepn1 or keepn1[1] and (close >= open) or (close >= close[1])
@@ -94,21 +85,21 @@ import org.ta4j.core.num.NumFactory;
  * keepn2 = (haClose < haOpen) and (haClose[1] < haOpen[1]) or (hl2Smooth < haCloseSmooth)
  * keep23 = shortCandle and (low <= high[1])
  * keepall2 = keepn2 or keepn2[1] and (close < open) or (close < close[1])
- *
+ * <p>
  * dtr = keepall2 or keepall2[1] and keep23
  * utr = keepall1 or keepall1[1] and keep13
  * upw = not dtr and dtr[1] and utr
  * dnw = not utr and utr[1] and dtr
  * var bool upwWithOffset = false
  * upwWithOffset := upw != dnw ? upw : upwWithOffset[1]
- *
+ * <p>
  * buySig = upw or not dnw and upwWithOffset
  * ltSellSig = close < ta.ema(close, emaLength)
  * var bool neutralSig = false
  * neutralSig := buySig or not ltSellSig and neutralSig[1]
- *
+ * <p>
  * hacolt = buySig ? 1 : neutralSig ? 0 : -1
- *
+ * <p>
  * plot(hacolt, style = plot.style_columns, color = hacolt > 0 ? color.green : hacolt < 0 ? color.red : color.blue,
  * title = "HACOLT")
  */
@@ -174,13 +165,13 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
 
         TripleEMAIndicator thl2 = new TripleEMAIndicator(hl2, barCount);
         TripleEMAIndicator thaClose = new TripleEMAIndicator(haClose, barCount);
-        haCloseSmooth = CombineIndicator.minus(TransformIndicator.multiply(thaClose, 2),
+        haCloseSmooth = CombineIndicator.minus(BinaryOperationIndicator.product(thaClose, 2),
                 new TripleEMAIndicator(thaClose, barCount));
-        hl2Smooth = CombineIndicator.minus(TransformIndicator.multiply(thl2, 2),
+        hl2Smooth = CombineIndicator.minus(BinaryOperationIndicator.product(thl2, 2),
                 new TripleEMAIndicator(thl2, barCount));
 
-        shortCandle = BooleanCombineIndicator.isLessThan(TransformIndicator.abs(new RealBodyIndicator(series)),
-                TransformIndicator.multiply(new RealRangeIndicator(series), candleSizeFactor));
+        shortCandle = BooleanCombineIndicator.isLessThan(UnaryOperationIndicator.abs(new RealBodyIndicator(series)),
+                BinaryOperationIndicator.product(new RealRangeIndicator(series), candleSizeFactor));
 
         BooleanCombineIndicator haGreen = BooleanCombineIndicator.isGreaterThanOrEqual(haClose, haOpen);
         BooleanCombineIndicator haPrevGreen = BooleanCombineIndicator.isGreaterThanOrEqual(haClosePrev, haOpenPrev);
@@ -297,7 +288,7 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
         private final HeikinAshiOpenIndicator haOpen;
 
         public HeikinAshiCloseIndicator(HighPriceIndicator high, LowPriceIndicator low, OHLC4PriceIndicator ohlc4,
-                HeikinAshiOpenIndicator haOpen) {
+                                        HeikinAshiOpenIndicator haOpen) {
             super(high);
 
             this.high = high;

@@ -3,9 +3,9 @@ package org.ta4j.core.indicators;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.indicators.averages.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
+import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -13,7 +13,7 @@ import org.ta4j.core.num.Num;
  * <a href="https://www.tradingview.com/script/v267CGzx-Simple-Hurst-Exponent-QuantNomad/">TradingView</a>
  */
 public class HurstExponentIndicator extends CachedIndicator<Num> {
-    private final TransformIndicator pnl;
+    private final BinaryOperationIndicator pnl;
     private final SMAIndicator meanPnl;
     private final int barCount;
 
@@ -24,15 +24,16 @@ public class HurstExponentIndicator extends CachedIndicator<Num> {
     public HurstExponentIndicator(ClosePriceIndicator indicator, int barCount) {
         super(indicator.getBarSeries());
 
-        this.pnl = TransformIndicator.minus(CombineIndicator.divide(indicator, new PreviousValueIndicator(indicator)),
+        this.pnl = BinaryOperationIndicator.difference(BinaryOperationIndicator.quotient(indicator, new PreviousValueIndicator(indicator)),
                 1);
         this.meanPnl = new SMAIndicator(pnl, barCount);
         this.barCount = barCount;
     }
 
-    @Override protected Num calculate(int index) {
-        TransformIndicator distanceFromMean = TransformIndicator.minus(pnl, meanPnl.getValue(index).doubleValue());
-        TransformIndicator distanceFromMeanPow = TransformIndicator.pow(distanceFromMean, 2);
+    @Override
+    protected Num calculate(int index) {
+        BinaryOperationIndicator distanceFromMean = BinaryOperationIndicator.difference(pnl, meanPnl.getValue(index).doubleValue());
+        UnaryOperationIndicator distanceFromMeanPow = UnaryOperationIndicator.pow(distanceFromMean, 2);
 
         Num cum = getBarSeries().numFactory().zero();
         Num cumMin = getBarSeries().numFactory().numOf(Double.MAX_VALUE);
@@ -56,7 +57,8 @@ public class HurstExponentIndicator extends CachedIndicator<Num> {
         return rs.log().dividedBy(getBarSeries().numFactory().numOf(barCount).log());
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return barCount;
     }
 }

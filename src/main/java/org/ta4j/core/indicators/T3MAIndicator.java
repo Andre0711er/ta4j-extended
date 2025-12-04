@@ -4,8 +4,7 @@ import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.EMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -36,21 +35,23 @@ public class T3MAIndicator extends AbstractIndicator<Num> {
         Num c3 = getBarSeries().numFactory().numOf(-6 * b * b - 3 * b - 3 * b * b * b);
         Num c4 = getBarSeries().numFactory().numOf(1 + 3 * b + b * b * b + 3 * b * b);
 
-        TransformIndicator addend1 = TransformIndicator.multiply(xe6, c1.doubleValue());
-        TransformIndicator addend2 = TransformIndicator.multiply(xe5, c2.doubleValue());
-        TransformIndicator addend3 = TransformIndicator.multiply(xe4, c3.doubleValue());
-        TransformIndicator addend4 = TransformIndicator.multiply(xe3, c4.doubleValue());
+        BinaryOperationIndicator addend1 = BinaryOperationIndicator.product(xe6, c1.doubleValue());
+        BinaryOperationIndicator addend2 = BinaryOperationIndicator.product(xe5, c2.doubleValue());
+        BinaryOperationIndicator addend3 = BinaryOperationIndicator.product(xe4, c3.doubleValue());
+        BinaryOperationIndicator addend4 = BinaryOperationIndicator.product(xe3, c4.doubleValue());
 
-        this.t3maIndicator = CombineIndicator.plus(
-                CombineIndicator.plus(CombineIndicator.plus(addend1, addend2), addend3), addend4);
+        this.t3maIndicator = BinaryOperationIndicator.sum(
+                BinaryOperationIndicator.sum(BinaryOperationIndicator.sum(addend1, addend2), addend3), addend4);
         this.barCount = barCount;
     }
 
-    @Override public Num getValue(int index) {
+    @Override
+    public Num getValue(int index) {
         return t3maIndicator.getValue(index);
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return barCount;
     }
 }

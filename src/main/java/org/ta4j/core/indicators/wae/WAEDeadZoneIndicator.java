@@ -4,7 +4,7 @@ import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.ATRIndicatorPlus;
 import org.ta4j.core.indicators.AbstractIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -18,14 +18,14 @@ public class WAEDeadZoneIndicator extends AbstractIndicator<Num> {
     public WAEDeadZoneIndicator(BarSeries series, int barCount, double multiplier) {
         super(series);
 
-        this.deadZone = TransformIndicator.multiply(new ATRIndicatorPlus(series, barCount), multiplier);
+        this.deadZone = BinaryOperationIndicator.product(new ATRIndicatorPlus(series, barCount), multiplier);
         this.barCount = barCount;
     }
 
     public WAEDeadZoneIndicator(BarSeries series, int barCount, double multiplier, ATRIndicatorPlus atrIndicatorPlus) {
         super(series);
 
-        this.deadZone = TransformIndicator.multiply(atrIndicatorPlus, multiplier);
+        this.deadZone = BinaryOperationIndicator.product(atrIndicatorPlus, multiplier);
         this.barCount = barCount;
     }
 

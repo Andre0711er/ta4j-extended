@@ -2,24 +2,17 @@ package org.ta4j.core.indicators;
 
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
-import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
-import org.ta4j.core.indicators.helpers.HighPriceIndicator;
-import org.ta4j.core.indicators.helpers.HighestValueIndicator;
-import org.ta4j.core.indicators.helpers.LowPriceIndicator;
-import org.ta4j.core.indicators.helpers.LowestValueIndicator;
-import org.ta4j.core.indicators.helpers.NzIndicator;
-import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
-import org.ta4j.core.indicators.helpers.TransformIndicator;
+import org.ta4j.core.indicators.helpers.*;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
  * Trend Trigger Factor (TTF) indicator by everget. <a
- * https://www.tradingview.com/script/WA9Z4CV2-Trend-Trigger-Factor/">TradingView</a>
+ * href="https://www.tradingview.com/script/WA9Z4CV2-Trend-Trigger-Factor/">TradingView</a>
  */
 public class TTFIndicator extends AbstractIndicator<Num> {
-	private final Indicator<Num> ttfIndicator;
-	private final int barCount;
+    private final Indicator<Num> ttfIndicator;
+    private final int barCount;
 
     public TTFIndicator(BarSeries series, int barCount) {
         this(new ClosePriceIndicator(series), barCount);
@@ -34,12 +27,12 @@ public class TTFIndicator extends AbstractIndicator<Num> {
                 barCount);
         Indicator<Num> previousHighestValue = new NzIndicator(new PreviousValueIndicator(highestValue, barCount));
         Indicator<Num> previousLowestValue = new NzIndicator(new PreviousValueIndicator(lowestValue, barCount));
-        Indicator<Num> buyPower = CombineIndicator.minus(highestValue, previousLowestValue);
-        Indicator<Num> sellPower = CombineIndicator.minus(previousHighestValue, lowestValue);
-        Indicator<Num> difference = CombineIndicator.minus(buyPower, sellPower);
-        Indicator<Num> differenceScaled = TransformIndicator.multiply(difference, 200);
-        Indicator<Num> sum = CombineIndicator.plus(buyPower, sellPower);
-        this.ttfIndicator = new NzIndicator(CombineIndicator.divide(differenceScaled, sum));
+        Indicator<Num> buyPower = BinaryOperationIndicator.difference(highestValue, previousLowestValue);
+        Indicator<Num> sellPower = BinaryOperationIndicator.difference(previousHighestValue, lowestValue);
+        Indicator<Num> difference = BinaryOperationIndicator.difference(buyPower, sellPower);
+        Indicator<Num> differenceScaled = BinaryOperationIndicator.product(difference, 200);
+        Indicator<Num> sum = BinaryOperationIndicator.sum(buyPower, sellPower);
+        this.ttfIndicator = new NzIndicator(BinaryOperationIndicator.quotient(differenceScaled, sum));
         this.barCount = barCount;
     }
 
