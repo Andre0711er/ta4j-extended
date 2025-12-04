@@ -3,9 +3,9 @@ package org.ta4j.core.indicators;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.EMAIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.HighPriceIndicator;
 import org.ta4j.core.indicators.helpers.LowPriceIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -19,18 +19,20 @@ public class ChaikinVolatilityIndicator extends AbstractIndicator<Num> {
     public ChaikinVolatilityIndicator(BarSeries series, int barCount, int rocBarCount) {
         super(series);
 
-        CombineIndicator priceRange = CombineIndicator.minus(new HighPriceIndicator(series),
+        BinaryOperationIndicator priceRange = BinaryOperationIndicator.difference(new HighPriceIndicator(series),
                 new LowPriceIndicator(series));
         EMAIndicator priceRangeEma = new EMAIndicator(priceRange, barCount);
         this.chaikinVolatilityIndicator = new ROCIndicator(priceRangeEma, rocBarCount);
         this.barCount = barCount;
     }
 
-    @Override public Num getValue(int index) {
+    @Override
+    public Num getValue(int index) {
         return chaikinVolatilityIndicator.getValue(index);
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return barCount;
     }
 }

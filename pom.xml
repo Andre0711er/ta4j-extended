@@ -36,7 +36,6 @@
 
     <!-- Build -->
     <maven.compiler.release>21</maven.compiler.release>
-    <maven.surefire.version>3.5.4</maven.surefire.version>
 
     <junit-jupiter.version>6.0.0</junit-jupiter.version>
 	</properties>
@@ -68,7 +67,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.4.2</version>
+				<version>3.5.0</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
@@ -81,7 +80,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.6.0</version>
+				<version>1.7.3</version>
 				<configuration>
 					<flattenedPomFilename>flattened-pom.xml</flattenedPomFilename>
 					<outputDirectory>${project.build.directory}</outputDirectory>

@@ -3,7 +3,7 @@ package org.ta4j.core.indicators;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.indicators.statistics.SimpleLinearRegressionIndicator;
 import org.ta4j.core.num.Num;
 
@@ -26,17 +26,19 @@ public class ZLSMAIndicator extends AbstractIndicator<Num> {
 
         SimpleLinearRegressionIndicator lsma = new SimpleLinearRegressionIndicator(indicator, barCount);
         SimpleLinearRegressionIndicator lsma2 = new SimpleLinearRegressionIndicator(lsma, barCount);
-        CombineIndicator eq = CombineIndicator.minus(lsma, lsma2);
+        Indicator<Num> eq = BinaryOperationIndicator.difference(lsma, lsma2);
 
-        this.zlsmaIndicator = CombineIndicator.plus(lsma, eq);
+        this.zlsmaIndicator = BinaryOperationIndicator.sum(lsma, eq);
         this.barCount = barCount;
     }
 
-    @Override public Num getValue(int index) {
+    @Override
+    public Num getValue(int index) {
         return zlsmaIndicator.getValue(index);
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return barCount;
     }
 }

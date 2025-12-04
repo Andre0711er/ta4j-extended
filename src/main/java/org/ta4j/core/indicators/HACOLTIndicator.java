@@ -6,7 +6,16 @@ import org.ta4j.core.indicators.averages.EMAIndicator;
 import org.ta4j.core.indicators.averages.TripleEMAIndicator;
 import org.ta4j.core.indicators.candles.RealBodyIndicator;
 import org.ta4j.core.indicators.candles.RealRangeIndicator;
-import org.ta4j.core.indicators.helpers.*;
+import org.ta4j.core.indicators.helpers.BooleanCombineIndicator;
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.indicators.helpers.HighPriceIndicator;
+import org.ta4j.core.indicators.helpers.LogicIndicator;
+import org.ta4j.core.indicators.helpers.LowPriceIndicator;
+import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
+import org.ta4j.core.indicators.helpers.OHLC4PriceIndicator;
+import org.ta4j.core.indicators.helpers.OpenPriceIndicator;
+import org.ta4j.core.indicators.helpers.PreviousBooleanValueIndicator;
+import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
 import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.num.Num;
@@ -121,8 +130,8 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
     private final HeikinAshiOpenIndicator haOpen;
     private final HeikinAshiCloseIndicator haClose;
 
-    private final CombineIndicator haCloseSmooth;
-    private final CombineIndicator hl2Smooth;
+    private final Indicator<Num> haCloseSmooth;
+    private final Indicator<Num> hl2Smooth;
 
     private final BooleanCombineIndicator shortCandle;
 
@@ -165,9 +174,9 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
 
         TripleEMAIndicator thl2 = new TripleEMAIndicator(hl2, barCount);
         TripleEMAIndicator thaClose = new TripleEMAIndicator(haClose, barCount);
-        haCloseSmooth = CombineIndicator.minus(BinaryOperationIndicator.product(thaClose, 2),
+        haCloseSmooth = BinaryOperationIndicator.difference(BinaryOperationIndicator.product(thaClose, 2),
                 new TripleEMAIndicator(thaClose, barCount));
-        hl2Smooth = CombineIndicator.minus(BinaryOperationIndicator.product(thl2, 2),
+        hl2Smooth = BinaryOperationIndicator.difference(BinaryOperationIndicator.product(thl2, 2),
                 new TripleEMAIndicator(thl2, barCount));
 
         shortCandle = BooleanCombineIndicator.isLessThan(UnaryOperationIndicator.abs(new RealBodyIndicator(series)),
@@ -233,14 +242,14 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
 
         final boolean buySigValueOrig = buySig.getValue(index);
         // buySig = upw or (not dnw and (na(upwWithOffset) ? 0 : upwWithOffset))
-        final boolean buySigValue = upwValue || (dnwValue == false && upwWithOffsetValue);
+        final boolean buySigValue = upwValue || (!dnwValue && upwWithOffsetValue);
         final boolean ltSellSigValueOrig = ltSellSig.getValue(index);
         // ltSellSig = close < ema(close, emaLength)
         final boolean ltSellSigValue = close.getValue(index).isLessThan(
                 new EMAIndicator(close, barCountEma).getValue(index));
         final boolean neutralSigValueOrig = neutralSig.getValue(index);
         // neutralSig = buySig or (ltSellSig ? 0 : nz(neutralSig[1]))
-        final boolean neutralSigValue = buySigValue || (ltSellSigValue == false && neutralSig.getValue(index - 1));
+        final boolean neutralSigValue = buySigValue || (!ltSellSigValue && neutralSig.getValue(index - 1));
 
         if (buySigValue) {
             return numFactory.one();

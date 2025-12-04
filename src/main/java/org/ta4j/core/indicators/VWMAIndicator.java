@@ -2,8 +2,8 @@ package org.ta4j.core.indicators;
 
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.SMAIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.VolumeIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -17,17 +17,19 @@ public class VWMAIndicator extends AbstractIndicator<Num> {
     public VWMAIndicator(Indicator<Num> indicator, int barCount) {
         super(indicator.getBarSeries());
         VolumeIndicator volumeIndicator = new VolumeIndicator(indicator.getBarSeries());
-        CombineIndicator inputTimesVolume = CombineIndicator.multiply(indicator, volumeIndicator);
-        this.vwmaIndicator = CombineIndicator.divide(new SMAIndicator(inputTimesVolume, barCount),
+        Indicator<Num> inputTimesVolume = BinaryOperationIndicator.product(indicator, volumeIndicator);
+        this.vwmaIndicator = BinaryOperationIndicator.quotient(new SMAIndicator(inputTimesVolume, barCount),
                 new SMAIndicator(volumeIndicator, barCount));
         this.barCount = barCount;
     }
 
-    @Override public Num getValue(int index) {
+    @Override
+    public Num getValue(int index) {
         return vwmaIndicator.getValue(index);
     }
 
-    @Override public int getCountOfUnstableBars() {
+    @Override
+    public int getCountOfUnstableBars() {
         return barCount;
     }
 }

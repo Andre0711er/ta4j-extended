@@ -3,10 +3,10 @@ package org.ta4j.core.indicators;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.HighPriceIndicator;
 import org.ta4j.core.indicators.helpers.LowPriceIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -50,8 +50,10 @@ public class VortexIndicator extends AbstractIndicator<Num> {
 
         LowPriceIndicator lowPriceIndicator = new LowPriceIndicator(getBarSeries());
         HighPriceIndicator highPriceIndicator = new HighPriceIndicator(getBarSeries());
-        highMinusPrevLow = CombineIndicator.minus(highPriceIndicator, new PreviousValueIndicator(lowPriceIndicator, 1));
-        lowMinusPrevHigh = CombineIndicator.minus(lowPriceIndicator, new PreviousValueIndicator(highPriceIndicator, 1));
+        highMinusPrevLow = BinaryOperationIndicator.difference(highPriceIndicator,
+                new PreviousValueIndicator(lowPriceIndicator, 1));
+        lowMinusPrevHigh = BinaryOperationIndicator.difference(lowPriceIndicator,
+                new PreviousValueIndicator(highPriceIndicator, 1));
         atrIndicator = new ATRIndicator(getBarSeries(), 1);
     }
 
@@ -60,7 +62,7 @@ public class VortexIndicator extends AbstractIndicator<Num> {
      *
      * @param index the bar index
      *
-     * @return
+     * @return zero
      */
     @Override
     public Num getValue(int index) {

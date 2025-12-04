@@ -3,6 +3,7 @@ package org.ta4j.core.indicators.helpers;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.AbstractIndicator;
+import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -29,7 +30,7 @@ public class ChangeIndicator extends AbstractIndicator<Num> {
     public ChangeIndicator(Indicator<Num> indicator, int barCount) {
         super(indicator.getBarSeries());
 
-        this.changeIndicator = CombineIndicator.minus(indicator, new PreviousValueIndicator(indicator, barCount));
+        this.changeIndicator = BinaryOperationIndicator.difference(indicator, new PreviousValueIndicator(indicator, barCount));
         this.indicator = indicator;
         this.barCount = barCount;
     }
