@@ -15,6 +15,11 @@ import org.ta4j.core.num.Num;
  */
 public class FantailVMAIndicator extends AbstractIndicator<Num> {
     private final Indicator<Num> fantailVMAIndicator;
+    /**
+     * Highest bar index already computed sequentially (see {@link #getValue(int)}).
+     * Benign under concurrent use: at worst two threads warm up the same prefix twice.
+     */
+    private volatile int warmedUpTo = -1;
 
     public FantailVMAIndicator(BarSeries series, int adxLength, int weighting, int barCount) {
         super(series);
@@ -23,7 +28,25 @@ public class FantailVMAIndicator extends AbstractIndicator<Num> {
 
     @Override
     public Num getValue(int index) {
+        warmUp(index);
         return fantailVMAIndicator.getValue(index);
+    }
+
+    /**
+     * Fills the delegate cache sequentially up to {@code index}.
+     * <p>
+     * The inner indicators ({@code STR/SPDI/SMDI/ADX/VarMA}) are recursive cached indicators calling
+     * {@code getValue(index - 1)} from {@code calculate}. A direct first call at a late index with an empty cache
+     * recurses {@code index} levels deep and dies with {@code StackOverflowError} (backtests start evaluating at the
+     * trading-window start, i.e., thousands of warm-up bars into the series). Computing every prefix index once keeps
+     * each individual call at recursion depth 1, so results are identical with or without the warm-up.
+     */
+    private synchronized void warmUp(int index) {
+        int start = Math.max(warmedUpTo + 1, getBarSeries().getBeginIndex());
+        for (int i = start; i <= index; i++) {
+            fantailVMAIndicator.getValue(i);
+        }
+        warmedUpTo = index;
     }
 
     @Override
