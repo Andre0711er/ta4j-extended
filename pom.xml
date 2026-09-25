@@ -9,11 +9,11 @@
   <parent>
     <groupId>org.ta4j</groupId>
     <artifactId>ta4j-parent</artifactId>
-    <version>0.23.0</version>
+    <version>0.25.0</version>
   </parent>
 
   <artifactId>ta4j-extended</artifactId>
-  <version>0.23.0-SNAPSHOT</version>
+  <version>0.25.0-SNAPSHOT</version>
 
   <url>https://github.com/Cypher01/ta4j-extended</url>
 
@@ -39,7 +39,7 @@
     <maven.compiler.release>25</maven.compiler.release>
 
     <!-- Dependencies -->
-    <junit-jupiter.version>6.0.2</junit-jupiter.version>
+    <junit-jupiter.version>6.0.3</junit-jupiter.version>
   </properties>
 
   <dependencies>
@@ -120,7 +120,7 @@
       </plugin>
 
       <!-- Code coverage
-           The parent POM (ta4j-parent 0.23.0) references @{argLine} in the
+           The parent POM (ta4j-parent 0.25.0) references @{argLine} in the
            surefire configuration. That late-binding token is only resolved
            when jacoco's prepare-agent goal runs and sets the argLine property.
            Without this plugin declaration @{argLine} stays literal, and the

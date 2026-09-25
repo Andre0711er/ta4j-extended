@@ -31,7 +31,7 @@ public class VortexIndicator extends AbstractIndicator<Num> {
 
     private final Indicator<Num> highMinusPrevLow;
     private final Indicator<Num> lowMinusPrevHigh;
-    private final ATRIndicator atrIndicator;
+    private final Indicator<Num> atrIndicator;
 
     public VortexIndicator(BarSeries series, int barCount) {
         this(new ClosePriceIndicator(series), barCount);
@@ -134,7 +134,7 @@ public class VortexIndicator extends AbstractIndicator<Num> {
     /**
      * ta4j-core API compatibility: {@code VortexIndicator.getPositiveValue} as defined by
      * {@code org.ta4j.core.indicators.VortexIndicator} in ta4j-core. This override shadows the
-     * core class (same FQN wins at runtime), so it must honor the full core API — a missing
+     * core class (the same FQN wins at runtime), so it must honor the full core API — a missing
      * method surfaces as {@code NoSuchMethodError} on every caller compiled against core
      * (seen in production on the backtest workers).
      *
