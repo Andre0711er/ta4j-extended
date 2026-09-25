@@ -1,53 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project
-	xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.ta4j</groupId>
-		<artifactId>ta4j-parent</artifactId>
-		<version>0.22.4</version>
-	</parent>
+  <parent>
+    <groupId>org.ta4j</groupId>
+    <artifactId>ta4j-parent</artifactId>
+    <version>0.25.0</version>
+  </parent>
 
-	<artifactId>ta4j-extended</artifactId>
-  <version>0.22.4-SNAPSHOT</version>
+  <artifactId>ta4j-extended</artifactId>
+  <version>0.25.0-SNAPSHOT</version>
 
-	<url>https://github.com/Cypher01/ta4j-extended</url>
+  <url>https://github.com/Cypher01/ta4j-extended</url>
 
-	<developers>
-		<developer>
-			<name>Cypher01</name>
-		</developer>
-	</developers>
+  <developers>
+    <developer>
+      <name>Cypher01</name>
+    </developer>
+  </developers>
 
-	<licenses>
-		<license>
-			<name>MIT License</name>
-			<comments>All source code is under the MIT license.</comments>
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <comments>All source code is under the MIT license.</comments>
+    </license>
+  </licenses>
 
-	<properties>
+  <properties>
     <!-- Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- Build -->
-    <maven.compiler.release>21</maven.compiler.release>
+    <maven.compiler.release>25</maven.compiler.release>
 
     <!-- Dependencies -->
-    <junit-jupiter.version>6.0.2</junit-jupiter.version>
-	</properties>
+    <junit-jupiter.version>6.0.3</junit-jupiter.version>
+  </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.ta4j</groupId>
-			<artifactId>ta4j-core</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>org.ta4j</groupId>
+      <artifactId>ta4j-core</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
@@ -62,52 +62,52 @@
       <version>${junit-jupiter.version}</version>
       <scope>test</scope>
     </dependency>
-	</dependencies>
+  </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.5.0</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Built-By>Cypher01</Built-By>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Built-By>Cypher01</Built-By>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.7.3</version>
-				<configuration>
-					<flattenedPomFilename>flattened-pom.xml</flattenedPomFilename>
-					<outputDirectory>${project.build.directory}</outputDirectory>
-					<pomElements>
-						<url>keep</url>
-						<developers>keep</developers>
-					</pomElements>
-				</configuration>
-				<executions>
-					<execution>
-						<id>flatten</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>flatten</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>flatten.clean</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.7.3</version>
+        <configuration>
+          <flattenedPomFilename>flattened-pom.xml</flattenedPomFilename>
+          <outputDirectory>${project.build.directory}</outputDirectory>
+          <pomElements>
+            <url>keep</url>
+            <developers>keep</developers>
+          </pomElements>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
       <!-- Source formatter -->
       <plugin>
@@ -119,6 +119,18 @@
         </configuration>
       </plugin>
 
-		</plugins>
-	</build>
+      <!-- Code coverage
+           The parent POM (ta4j-parent 0.25.0) references @{argLine} in the
+           surefire configuration. That late-binding token is only resolved
+           when jacoco's prepare-agent goal runs and sets the argLine property.
+           Without this plugin declaration @{argLine} stays literal, and the
+           forked test VM fails to start (the JVM interprets the leading '@'
+           as an argument file). -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>
