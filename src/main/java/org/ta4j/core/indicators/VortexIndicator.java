@@ -31,7 +31,7 @@ public class VortexIndicator extends AbstractIndicator<Num> {
 
     private final Indicator<Num> highMinusPrevLow;
     private final Indicator<Num> lowMinusPrevHigh;
-    private final ATRIndicator atrIndicator;
+    private final Indicator<Num> atrIndicator;
 
     public VortexIndicator(BarSeries series, int barCount) {
         this(new ClosePriceIndicator(series), barCount);
@@ -129,6 +129,32 @@ public class VortexIndicator extends AbstractIndicator<Num> {
         Num atr = getTrueRangeFromBarCount(index, startIndex);
 
         return lowMinusHighPrev.dividedBy(atr).abs();
+    }
+
+    /**
+     * ta4j-core API compatibility: {@code VortexIndicator.getPositiveValue} as defined by
+     * {@code org.ta4j.core.indicators.VortexIndicator} in ta4j-core. This override shadows the
+     * core class (the same FQN wins at runtime), so it must honor the full core API — a missing
+     * method surfaces as {@code NoSuchMethodError} on every caller compiled against core
+     * (seen in production on the backtest workers).
+     *
+     * @param index the bar index
+     *
+     * @return the VI+ value (same as {@link #getViPlus(int)})
+     */
+    public Num getPositiveValue(int index) {
+        return getViPlus(index);
+    }
+
+    /**
+     * ta4j-core API compatibility, see {@link #getPositiveValue(int)}.
+     *
+     * @param index the bar index
+     *
+     * @return the VI- value (same as {@link #getViMinus(int)})
+     */
+    public Num getNegativeValue(int index) {
+        return getViMinus(index);
     }
 
     @Override
