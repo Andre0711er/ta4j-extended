@@ -4,7 +4,7 @@ import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.EMAIndicator;
 import org.ta4j.core.indicators.averages.TripleEMAIndicator;
-import org.ta4j.core.indicators.candles.RealBodyIndicator;
+import org.ta4j.core.indicators.candles.CandleBodyIndicator;
 import org.ta4j.core.indicators.candles.RealRangeIndicator;
 import org.ta4j.core.indicators.helpers.BooleanCombineIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
@@ -17,7 +17,6 @@ import org.ta4j.core.indicators.helpers.OpenPriceIndicator;
 import org.ta4j.core.indicators.helpers.PreviousBooleanValueIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
 import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
-import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.NumFactory;
 
@@ -176,7 +175,7 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
         hl2Smooth = BinaryOperationIndicator.difference(BinaryOperationIndicator.product(thl2, 2),
                 new PineCompatTripleEMAIndicator(thl2, barCount));
 
-        shortCandle = BooleanCombineIndicator.isLessThan(UnaryOperationIndicator.abs(new RealBodyIndicator(series)),
+        shortCandle = BooleanCombineIndicator.isLessThan(new CandleBodyIndicator(series),
                 BinaryOperationIndicator.product(new RealRangeIndicator(series), candleSizeFactor));
 
         BooleanCombineIndicator haGreen = BooleanCombineIndicator.isGreaterThanOrEqual(haClose, haOpen);
