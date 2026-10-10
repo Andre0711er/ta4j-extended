@@ -23,8 +23,8 @@
  */
 package org.ta4j.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.math.BigDecimal;
 
@@ -114,11 +114,11 @@ public class TestUtils {
      * @param actual   indicator of actual values
      */
     public static void assertIndicatorEquals(Indicator<Num> expected, Indicator<Num> actual) {
-        org.junit.Assert.assertEquals("Size does not match,", expected.getBarSeries().getBarCount(),
-                actual.getBarSeries().getBarCount());
+        org.junit.jupiter.api.Assertions.assertEquals(expected.getBarSeries().getBarCount(),
+                actual.getBarSeries().getBarCount(), "Size does not match,");
         for (int i = 0; i < expected.getBarSeries().getBarCount(); i++) {
-            assertEquals(String.format("Failed at index %s: %s", i, actual.toString()),
-                    expected.getValue(i).doubleValue(), actual.getValue(i).doubleValue(), GENERAL_OFFSET);
+            assertEquals(expected.getValue(i).doubleValue(), actual.getValue(i).doubleValue(), GENERAL_OFFSET,
+                    String.format("Failed at index %s: %s", i, actual.toString()));
         }
     }
 
@@ -184,8 +184,8 @@ public class TestUtils {
      * @param actual   indicator of actual values
      */
     public static void assertIndicatorEquals(Indicator<Num> expected, Indicator<Num> actual, Num delta) {
-        org.junit.Assert.assertEquals("Size does not match,", expected.getBarSeries().getBarCount(),
-                actual.getBarSeries().getBarCount());
+        org.junit.jupiter.api.Assertions.assertEquals(expected.getBarSeries().getBarCount(),
+                actual.getBarSeries().getBarCount(), "Size does not match,");
         for (int i = expected.getBarSeries().getBeginIndex(); i < expected.getBarSeries().getEndIndex(); i++) {
             // convert to DecimalNum via String (auto-precision) avoids Cast Class
             // Exception

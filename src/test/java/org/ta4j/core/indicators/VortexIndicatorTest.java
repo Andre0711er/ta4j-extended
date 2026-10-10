@@ -1,13 +1,13 @@
 package org.ta4j.core.indicators;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import java.io.IOException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.TestdataReader;
@@ -21,7 +21,7 @@ public class VortexIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, N
         super(numFactory);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         data = new TestdataReader(numFactory).readCsv("btcusdt-1d.csv");
     }
@@ -73,17 +73,15 @@ public class VortexIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, N
             Num viMinus = indicator.getViMinus(index);
             Num negative = indicator.getNegativeValue(index);
 
-            assertFalse("VI+ must not be null at index " + index, viPlus == null || positive == null);
-            assertFalse("VI- must not be null at index " + index, viMinus == null || negative == null);
+            assertFalse(viPlus == null || positive == null, "VI+ must not be null at index " + index);
+            assertFalse(viMinus == null || negative == null, "VI- must not be null at index " + index);
             if (viPlus.isNaN() || positive.isNaN()) {
-                assertTrue("VI+ and positive value must both be NaN at index " + index,
-                        viPlus.isNaN() && positive.isNaN());
+                assertTrue(viPlus.isNaN() && positive.isNaN(), "VI+ and positive value must both be NaN at index " + index);
             } else {
                 assertNumEquals(viPlus, positive);
             }
             if (viMinus.isNaN() || negative.isNaN()) {
-                assertTrue("VI- and negative value must both be NaN at index " + index,
-                        viMinus.isNaN() && negative.isNaN());
+                assertTrue(viMinus.isNaN() && negative.isNaN(), "VI- and negative value must both be NaN at index " + index);
             } else {
                 assertNumEquals(viMinus, negative);
             }

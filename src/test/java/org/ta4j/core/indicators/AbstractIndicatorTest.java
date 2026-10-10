@@ -24,8 +24,8 @@
 package org.ta4j.core.indicators;
 
 import java.util.List;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.IndicatorFactory;
 import org.ta4j.core.num.DecimalNum;
@@ -46,12 +46,12 @@ import org.ta4j.core.num.NumFactory;
  * @param <I> The generic class of the test indicator (could be
  *            <code>Num</code>, <code>Boolean</code>, ...)
  */
-@RunWith(Parameterized.class)
+@ParameterizedClass(name = "Test Case: {index} (0=DoubleNum, 1=DecimalNum)")
+@MethodSource("org.ta4j.core.indicators.AbstractIndicatorTest#function")
 public abstract class AbstractIndicatorTest<D, I> {
 
     public final NumFactory numFactory;
 
-    @Parameterized.Parameters(name = "Test Case: {index} (0=DoubleNum, 1=DecimalNum)")
     public static List<NumFactory> function() {
         return List.of(DoubleNumFactory.getInstance(), DecimalNumFactory.getInstance());
     }
