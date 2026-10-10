@@ -1,13 +1,13 @@
 package org.ta4j.core.indicators.helpers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
@@ -25,7 +25,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
         super(numFactory);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // 4 bars – close-price values are irrelevant for Boolean logic
         series = new MockBarSeriesBuilder()
@@ -76,7 +76,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
     public void notInvertsTrueToFalse() {
         LogicIndicator not = LogicIndicator.not(fixed(true, true, true, true));
         for (int i = 0; i < 4; i++) {
-            assertFalse("not(true) must be false at index " + i, not.getValue(i));
+            assertFalse(not.getValue(i), "not(true) must be false at index " + i);
         }
     }
 
@@ -84,7 +84,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
     public void notInvertsFalseToTrue() {
         LogicIndicator not = LogicIndicator.not(fixed(false, false, false, false));
         for (int i = 0; i < 4; i++) {
-            assertTrue("not(false) must be true at index " + i, not.getValue(i));
+            assertTrue(not.getValue(i), "not(false) must be true at index " + i);
         }
     }
 
@@ -108,7 +108,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                 fixed(true, true, true, true),
                 fixed(true, true, true, true));
         for (int i = 0; i < 4; i++) {
-            assertTrue("and(T,T) must be true at index " + i, and.getValue(i));
+            assertTrue(and.getValue(i), "and(T,T) must be true at index " + i);
         }
     }
 
@@ -130,7 +130,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                 fixed(false, false, false, false),
                 fixed(false, false, false, false));
         for (int i = 0; i < 4; i++) {
-            assertFalse("and(F,F) must be false at index " + i, and.getValue(i));
+            assertFalse(and.getValue(i), "and(F,F) must be false at index " + i);
         }
     }
 
@@ -145,7 +145,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                 fixed(true, true, true, true),
                 fixed(true, true, true, true)));
         for (int i = 0; i < 4; i++) {
-            assertTrue("and(T,T,T) must be true at index " + i, and.getValue(i));
+            assertTrue(and.getValue(i), "and(T,T,T) must be true at index " + i);
         }
     }
 
@@ -172,7 +172,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                 fixed(false, false, false, false),
                 fixed(false, false, false, false));
         for (int i = 0; i < 4; i++) {
-            assertFalse("or(F,F) must be false at index " + i, or.getValue(i));
+            assertFalse(or.getValue(i), "or(F,F) must be false at index " + i);
         }
     }
 
@@ -194,7 +194,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                 fixed(true, true, true, true),
                 fixed(true, true, true, true));
         for (int i = 0; i < 4; i++) {
-            assertTrue("or(T,T) must be true at index " + i, or.getValue(i));
+            assertTrue(or.getValue(i), "or(T,T) must be true at index " + i);
         }
     }
 
@@ -209,7 +209,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                 fixed(false, false, false, false),
                 fixed(false, false, false, false)));
         for (int i = 0; i < 4; i++) {
-            assertFalse("or(F,F,F) must be false at index " + i, or.getValue(i));
+            assertFalse(or.getValue(i), "or(F,F,F) must be false at index " + i);
         }
     }
 
@@ -282,7 +282,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                         fixed(false, false, false, false)),
                 list -> list.stream().noneMatch(v -> v));
         for (int i = 0; i < 4; i++) {
-            assertTrue("noneMatch(F,F) must be true at index " + i, none.getValue(i));
+            assertTrue(none.getValue(i), "noneMatch(F,F) must be true at index " + i);
         }
     }
 
@@ -293,7 +293,7 @@ public class LogicIndicatorTest extends AbstractIndicatorTest<Indicator<Num>, Nu
                 List.of(fixed(true, true, true, true)),
                 list -> list.stream().noneMatch(v -> v));
         for (int i = 0; i < 4; i++) {
-            assertFalse("noneMatch(T) must be false at index " + i, none.getValue(i));
+            assertFalse(none.getValue(i), "noneMatch(T) must be false at index " + i);
         }
     }
 

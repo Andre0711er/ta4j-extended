@@ -1,11 +1,12 @@
 package org.ta4j.core.indicators.helpers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.AbstractIndicatorTest;
@@ -22,7 +23,7 @@ public class PreviousBooleanValueIndicatorTest extends AbstractIndicatorTest<Ind
         super(numFactory);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // 5 bars – close-price values are irrelevant for Boolean logic
         series = new MockBarSeriesBuilder().withNumFactory(numFactory).withData(1.0, 2.0, 3.0, 4.0, 5.0).build();
@@ -54,7 +55,7 @@ public class PreviousBooleanValueIndicatorTest extends AbstractIndicatorTest<Ind
     public void defaultConstructorReturnsFalseAtIndexZero() {
         // no bar before index 0 → always false
         var prev = new PreviousBooleanValueIndicator(fixed(true, true, true, true, true));
-        assertFalse("index 0 has no previous bar – must return false", prev.getValue(0));
+        assertFalse(prev.getValue(0), "index 0 has no previous bar – must return false");
     }
 
     @Test
@@ -74,7 +75,7 @@ public class PreviousBooleanValueIndicatorTest extends AbstractIndicatorTest<Ind
         // source: all-false → prev(1): [false, F, F, F, F] (still all false)
         var prev = new PreviousBooleanValueIndicator(fixed(false, false, false, false, false));
         for (int i = 0; i < 5; i++) {
-            assertFalse("prev(1) of all-false must be false at index " + i, prev.getValue(i));
+            assertFalse(prev.getValue(i), "prev(1) of all-false must be false at index " + i);
         }
     }
 
@@ -88,8 +89,8 @@ public class PreviousBooleanValueIndicatorTest extends AbstractIndicatorTest<Ind
         var withDefault = new PreviousBooleanValueIndicator(source);
         var withExplicit = new PreviousBooleanValueIndicator(source, 1);
         for (int i = 0; i < 5; i++) {
-            assertEquals("explicit n=1 must match default constructor at index " + i, withDefault.getValue(i),
-                    withExplicit.getValue(i));
+            assertEquals(withDefault.getValue(i), withExplicit.getValue(i),
+                    "explicit n=1 must match default constructor at index " + i);
         }
     }
 
@@ -100,8 +101,8 @@ public class PreviousBooleanValueIndicatorTest extends AbstractIndicatorTest<Ind
     @Test
     public void n2ReturnsFalseForFirstTwoBars() {
         var prev = new PreviousBooleanValueIndicator(fixed(true, true, true, true, true), 2);
-        assertFalse("index 0 → previousIndex -2 → false", prev.getValue(0));
-        assertFalse("index 1 → previousIndex -1 → false", prev.getValue(1));
+        assertFalse(prev.getValue(0), "index 0 → previousIndex -2 → false");
+        assertFalse(prev.getValue(1), "index 1 → previousIndex -1 → false");
     }
 
     @Test
@@ -163,14 +164,16 @@ public class PreviousBooleanValueIndicatorTest extends AbstractIndicatorTest<Ind
     // Invalid n → IllegalArgumentException
     // ---------------------------------------------------------------
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void throwsWhenNIsZero() {
-        new PreviousBooleanValueIndicator(fixed(true, true, true, true, true), 0);
+        assertThrows(IllegalArgumentException.class,
+                () -> new PreviousBooleanValueIndicator(fixed(true, true, true, true, true), 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void throwsWhenNIsNegative() {
-        new PreviousBooleanValueIndicator(fixed(true, true, true, true, true), -3);
+        assertThrows(IllegalArgumentException.class,
+                () -> new PreviousBooleanValueIndicator(fixed(true, true, true, true, true), -3));
     }
 
     // ---------------------------------------------------------------
@@ -181,19 +184,19 @@ public class PreviousBooleanValueIndicatorTest extends AbstractIndicatorTest<Ind
     public void toStringWithN1OmitsParentheses() {
         var prev = new PreviousBooleanValueIndicator(fixed(true, true, true, true, true));
         String str = prev.toString();
-        assertTrue("must start with class name", str.startsWith("PreviousBooleanValueIndicator["));
-        assertFalse("n=1 must NOT include (1) in toString", str.contains("(1)"));
+        assertTrue(str.startsWith("PreviousBooleanValueIndicator["), "must start with class name");
+        assertFalse(str.contains("(1)"), "n=1 must NOT include (1) in toString");
     }
 
     @Test
     public void toStringWithN2IncludesParentheses() {
         var prev = new PreviousBooleanValueIndicator(fixed(true, true, true, true, true), 2);
-        assertTrue("n=2 must include (2) in toString", prev.toString().contains("(2)"));
+        assertTrue(prev.toString().contains("(2)"), "n=2 must include (2) in toString");
     }
 
     @Test
     public void toStringWithN3IncludesParentheses() {
         var prev = new PreviousBooleanValueIndicator(fixed(true, true, true, true, true), 3);
-        assertTrue("n=3 must include (3) in toString", prev.toString().contains("(3)"));
+        assertTrue(prev.toString().contains("(3)"), "n=3 must include (3) in toString");
     }
 }

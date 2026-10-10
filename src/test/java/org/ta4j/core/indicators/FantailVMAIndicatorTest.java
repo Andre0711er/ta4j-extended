@@ -5,9 +5,9 @@ import static org.ta4j.core.TestUtils.assertNumEquals;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBarSeriesBuilder;
 import org.ta4j.core.Indicator;
@@ -22,7 +22,7 @@ public class FantailVMAIndicatorTest extends AbstractIndicatorTest<Indicator<Num
         super(numFactory);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         data = new TestdataReader(numFactory).readCsv("btcusdt-1d.csv");
     }
@@ -41,7 +41,7 @@ public class FantailVMAIndicatorTest extends AbstractIndicatorTest<Indicator<Num
         BarSeries series = largeSeries(5_000);
         var indicator = new FantailVMAIndicator(series, 2, 10, 6);
 
-        Assert.assertNotNull(indicator.getValue(series.getEndIndex()));
+        Assertions.assertNotNull(indicator.getValue(series.getEndIndex()));
     }
 
     @Test

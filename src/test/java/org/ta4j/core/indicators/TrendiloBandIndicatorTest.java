@@ -3,8 +3,8 @@ package org.ta4j.core.indicators;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
 import java.io.IOException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.TestdataReader;
@@ -18,7 +18,7 @@ public class TrendiloBandIndicatorTest extends AbstractIndicatorTest<Indicator<N
         super(numFactory);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         data = new TestdataReader(numFactory).readCsv("btcusdt-1d.csv");
     }
