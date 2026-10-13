@@ -67,7 +67,8 @@ public class RecursiveIndicatorsLateQueryTest {
                 of("McGinley", BARS, s -> new McGinleyDynamicIndicator(new ClosePriceIndicator(s), 14)),
                 of("SupertrendPlus", BARS, s -> new SupertrendIndicatorPlus(s, 10, 3.0, ATRIndicatorPlus.Input.SMA)),
                 of("FantailVMA", BARS, s -> new FantailVMAIndicator(s, 2, 10, 6)),
-                of("VolumeFlow", BARS, s -> new VolumeFlowIndicator(s, 130, 0.2, 2.5)),
+                // not self-recursive and very slow with DecimalNum, so fewer bars
+                of("VolumeFlow", 2_000, s -> new VolumeFlowIndicator(s, 130, 0.2, 2.5)),
                 of("Trailing", BARS, s -> TrailingIndicator.ema(s, 20, 5_000, TrailingIndicator.Direction.UP)),
                 of("GChannelUpper", BARS, s -> new GChannelFacade(new ClosePriceIndicator(s), 100).upper()),
                 of("GChannelLower", BARS, s -> new GChannelFacade(new ClosePriceIndicator(s), 100).lower()),
