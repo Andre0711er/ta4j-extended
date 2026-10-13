@@ -53,7 +53,7 @@ public class CoralTrendIndicator extends AbstractIndicator<Num> {
         return smoothingPeriod;
     }
 
-    private static class IIndicator extends CachedIndicator<Num> {
+    private static class IIndicator extends RecursiveCachedIndicator<Num> {
         private final BinaryOperationIndicator addend1;
         private final Num c2;
 
