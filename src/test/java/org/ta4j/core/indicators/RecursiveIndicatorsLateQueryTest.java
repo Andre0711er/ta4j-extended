@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBarSeriesBuilder;
 import org.ta4j.core.Indicator;
+import org.ta4j.core.indicators.gchannel.GChannelFacade;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.TrailingIndicator;
 import org.ta4j.core.indicators.rangefilter.RangeFilterFallingIndicator;
@@ -45,6 +46,8 @@ public class RecursiveIndicatorsLateQueryTest {
                 Arguments.of("HEMA", BARS, (Function<BarSeries, Indicator<?>>) s -> new HEMAIndicator(s, 20, 20)),
                 Arguments.of("McGinley", BARS, (Function<BarSeries, Indicator<?>>) s -> new McGinleyDynamicIndicator(new ClosePriceIndicator(s), 14)),
                 Arguments.of("Trailing", BARS, (Function<BarSeries, Indicator<?>>) s -> TrailingIndicator.ema(s, 20, 5_000, TrailingIndicator.Direction.UP)),
+                Arguments.of("GChannelUpper", BARS, (Function<BarSeries, Indicator<?>>) s -> new GChannelFacade(new ClosePriceIndicator(s), 100).upper()),
+                Arguments.of("GChannelLower", BARS, (Function<BarSeries, Indicator<?>>) s -> new GChannelFacade(new ClosePriceIndicator(s), 100).lower()),
                 Arguments.of("RangeFilterRising", RANGE_FILTER_BARS,
                         (Function<BarSeries, Indicator<?>>) s -> new RangeFilterRisingIndicator(new RangeFilterIndicator(s, 100, 3.0))),
                 Arguments.of("RangeFilterFalling", RANGE_FILTER_BARS,
