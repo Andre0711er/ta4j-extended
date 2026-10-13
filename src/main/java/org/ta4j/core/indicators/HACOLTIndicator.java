@@ -244,7 +244,7 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
         return unstableBars;
     }
 
-    public static class HeikinAshiOpenIndicator extends CachedIndicator<Num> {
+    public static class HeikinAshiOpenIndicator extends RecursiveCachedIndicator<Num> {
         private final OHLC4PriceIndicator ohlc4;
 
         public HeikinAshiOpenIndicator(OHLC4PriceIndicator ohlc4) {
@@ -298,7 +298,7 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
         }
     }
 
-    private static class UpwWithOffset extends CachedIndicator<Boolean> {
+    private static class UpwWithOffset extends RecursiveCachedIndicator<Boolean> {
         private final Indicator<Boolean> upw;
         private final Indicator<Boolean> dnw;
 
@@ -331,7 +331,7 @@ public class HACOLTIndicator extends CachedIndicator<Num> {
         }
     }
 
-    private static class NeutralSig extends CachedIndicator<Boolean> {
+    private static class NeutralSig extends RecursiveCachedIndicator<Boolean> {
         private final Indicator<Boolean> buySig;
         private final Indicator<Boolean> ltSellSig;
 

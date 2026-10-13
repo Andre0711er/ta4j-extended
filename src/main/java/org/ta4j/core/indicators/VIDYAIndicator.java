@@ -7,7 +7,7 @@ import org.ta4j.core.num.Num;
  * Variable Index Dynamic Average (VIDYA) indicator by everget.
  * <a href="https://www.tradingview.com/script/hdrf0fXV-Variable-Index-Dynamic-Average-VIDYA/">TradingView</a>
  */
-public class VIDYAIndicator extends CachedIndicator<Num> {
+public class VIDYAIndicator extends RecursiveCachedIndicator<Num> {
     private final Indicator<Num> indicator;
     private final Indicator<Num> cmoIndicator;
     private final int barCount;

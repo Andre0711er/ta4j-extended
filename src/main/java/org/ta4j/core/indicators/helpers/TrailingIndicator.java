@@ -18,7 +18,7 @@ import static org.ta4j.core.num.NaN.NaN;
  * In case of up, if the indicator rises, the trailing indicator follows, if the indicator falls, the trailing indicator will stay the same.
  * In case of down, if the indicator falls, the trailing indicator follows, if the indicator rises, the trailing indicator will stay the same.
  */
-public class TrailingIndicator extends CachedIndicator<Num> {
+public class TrailingIndicator extends RecursiveCachedIndicator<Num> {
     private final Indicator<Num> indicator;
     private final int startIndex;
     private final Direction direction;

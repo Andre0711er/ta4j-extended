@@ -11,7 +11,7 @@ import org.ta4j.core.num.Num;
  * Holt Exponential Moving Average (HEMA) indicator by everget.
  * <a href="https://www.tradingview.com/script/Y9K4SHMj-Holt-Exponential-Moving-Average/">TradingView</a>
  */
-public class HEMAIndicator extends CachedIndicator<Num> {
+public class HEMAIndicator extends RecursiveCachedIndicator<Num> {
     private final Indicator<Num> indicator;
     private final Num alpha;
     private final NzIndicator bIndicator;
@@ -46,7 +46,7 @@ public class HEMAIndicator extends CachedIndicator<Num> {
         return unstableBars;
     }
 
-    private static class BIndicator extends CachedIndicator<Num> {
+    private static class BIndicator extends RecursiveCachedIndicator<Num> {
         private final ChangeIndicator hemaChangeIndicator;
         private final Num gamma;
 

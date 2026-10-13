@@ -1,6 +1,6 @@
 package org.ta4j.core.indicators.rangefilter;
 
-import org.ta4j.core.indicators.CachedIndicator;
+import org.ta4j.core.indicators.RecursiveCachedIndicator;
 import org.ta4j.core.num.Num;
 
 /**
@@ -8,7 +8,7 @@ import org.ta4j.core.num.Num;
  * <a
  * href="https://www.tradingview.com/script/J8GzFGfD-Range-Filter-Buy-and-Sell-5min-guikroth-version/">TradingView</a>
  */
-public class RangeFilterRisingIndicator extends CachedIndicator<Num> {
+public class RangeFilterRisingIndicator extends RecursiveCachedIndicator<Num> {
     private final RangeFilterIndicator rangeFilterIndicator;
 
     public RangeFilterRisingIndicator(RangeFilterIndicator rangeFilterIndicator) {
