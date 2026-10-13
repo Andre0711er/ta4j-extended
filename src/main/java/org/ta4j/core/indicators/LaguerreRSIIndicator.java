@@ -35,7 +35,7 @@ public class LaguerreRSIIndicator extends CachedIndicator<Num> {
 		return cuIndicator.getCountOfUnstableBars();
 	}
 
-	private static final class L0Indicator extends CachedIndicator<Num> {
+	private static final class L0Indicator extends RecursiveCachedIndicator<Num> {
 		private final Indicator<Num> indicator;
 		private final Num alpha;
 		private final Num gamma;
@@ -63,7 +63,7 @@ public class LaguerreRSIIndicator extends CachedIndicator<Num> {
 		}
 	}
 
-	private static final class L123Indicator extends CachedIndicator<Num> {
+	private static final class L123Indicator extends RecursiveCachedIndicator<Num> {
 		private final Indicator<Num> indicator;
 		private final Num gamma;
 		private final Num negGamma;

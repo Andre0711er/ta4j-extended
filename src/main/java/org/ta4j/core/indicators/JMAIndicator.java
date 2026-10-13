@@ -11,7 +11,7 @@ import org.ta4j.core.num.NumFactory;
 /**
  * Jurik Moving Average (JMA) indicator by everget. <a href="https://www.tradingview.com/script/nZuBWW9j-Jurik-Moving-Average/">TradingView</a>
  */
-public class JMAIndicator extends CachedIndicator<Num> {
+public class JMAIndicator extends RecursiveCachedIndicator<Num> {
     private final Indicator<Num> e2Indicator;
     private final int barCount;
 
@@ -55,7 +55,7 @@ public class JMAIndicator extends CachedIndicator<Num> {
         return barCount;
     }
 
-    private static class E0Indicator extends CachedIndicator<Num> {
+    private static class E0Indicator extends RecursiveCachedIndicator<Num> {
         private final Indicator<Num> indicator;
         private final double alpha;
 
@@ -82,7 +82,7 @@ public class JMAIndicator extends CachedIndicator<Num> {
         }
     }
 
-    private static class E1Indicator extends CachedIndicator<Num> {
+    private static class E1Indicator extends RecursiveCachedIndicator<Num> {
         private final Indicator<Num> indicator;
         private final E0Indicator e0Indicator;
         private final double beta;
@@ -115,7 +115,7 @@ public class JMAIndicator extends CachedIndicator<Num> {
         }
     }
 
-    private static class E2Indicator extends CachedIndicator<Num> {
+    private static class E2Indicator extends RecursiveCachedIndicator<Num> {
         private final E0Indicator e0Indicator;
         private final E1Indicator e1Indicator;
         private final NzIndicator nzPrevJmaIndicator;

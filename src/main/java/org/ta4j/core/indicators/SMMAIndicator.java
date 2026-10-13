@@ -6,7 +6,7 @@ import org.ta4j.core.num.Num;
 /**
  * Smoothed moving average (SMMA) indicator, based on TradingView built-in indicator.
  */
-public class SMMAIndicator extends CachedIndicator<Num> {
+public class SMMAIndicator extends RecursiveCachedIndicator<Num> {
     private final Indicator<Num> indicator;
     private final int barCount;
 

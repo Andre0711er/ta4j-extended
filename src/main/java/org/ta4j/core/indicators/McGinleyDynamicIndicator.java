@@ -7,7 +7,7 @@ import org.ta4j.core.num.Num;
 /**
  * McGinley dynamic indicator, based on TradingView built-in indicator.
  */
-public class McGinleyDynamicIndicator extends CachedIndicator<Num> {
+public class McGinleyDynamicIndicator extends RecursiveCachedIndicator<Num> {
     private final Indicator<Num> indicator;
     private final Indicator<Num> emaIndicator;
     private final int barCount;

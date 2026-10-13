@@ -11,7 +11,7 @@ import org.ta4j.core.num.Num;
  * Corrected Moving Average indicator by everget.
  * <a href="https://www.tradingview.com/script/0nfmHG29-Corrected-Moving-Average/">TradingView</a>
  */
-public class CMAIndicator extends CachedIndicator<Num> {
+public class CMAIndicator extends RecursiveCachedIndicator<Num> {
     private final Num tolerance;
     private final Indicator<Num> indicator;
     private final SMAIndicator sma;

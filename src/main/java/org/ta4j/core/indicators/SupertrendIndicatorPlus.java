@@ -12,7 +12,7 @@ import org.ta4j.core.num.Num;
  * Supertrend indicator with more flexible configuration, based on PineScript v5 Reference Manual.
  * <a href="https://www.tradingview.com/pine-script-reference/v5/#fun_ta.supertrend">TradingView</a>
  */
-public class SupertrendIndicatorPlus extends CachedIndicator<Num> {
+public class SupertrendIndicatorPlus extends RecursiveCachedIndicator<Num> {
     private final Indicator<Num> closePriceIndicator;
     private final Indicator<Num> upperAtrBandIndicator;
     private final Indicator<Num> lowerAtrBandIndicator;
