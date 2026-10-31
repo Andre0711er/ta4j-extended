@@ -13,7 +13,6 @@ import org.ta4j.core.num.NumFactory;
 public class SRSIIndicator extends CachedIndicator<Num> {
     private final Indicator<Num> r4;
     private final Indicator<Num> r5;
-    private final int unstableBars;
 
     public SRSIIndicator(Indicator<Num> indicator, int barCount, int smoothing) {
         super(indicator);
@@ -23,7 +22,6 @@ public class SRSIIndicator extends CachedIndicator<Num> {
         Indicator<Num> r3 = BinaryOperationIndicator.max(BinaryOperationIndicator.difference(r1, indicator), 0);
         this.r4 = new SMMAIndicator(r2, smoothing);
         this.r5 = new SMMAIndicator(r3, smoothing);
-        this.unstableBars = Math.max(barCount, smoothing);
     }
 
     @Override
@@ -40,6 +38,7 @@ public class SRSIIndicator extends CachedIndicator<Num> {
 
     @Override
     public int getCountOfUnstableBars() {
-        return unstableBars;
+        // Covers the EMA warm-up (NaN for barCount bars) plus the SMMA settling
+        return Math.max(r4.getCountOfUnstableBars(), r5.getCountOfUnstableBars());
     }
 }

@@ -8,6 +8,7 @@ import org.ta4j.core.BaseBarSeriesBuilder;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.bars.TimeBarBuilder;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Heikin Ashi indicator.
@@ -51,11 +52,6 @@ public class HeikinAshiIndicator extends RecursiveCachedIndicator<Bar> {
 
     @Override
     protected Bar calculate(int index) {
-        if (index == 0) {
-            return indicator.getValue(index);
-        }
-
-        Bar prevHaBar = getValue(index - 1);
         Bar bar = indicator.getValue(index);
 
         Num openPrice = bar.getOpenPrice();
@@ -63,10 +59,21 @@ public class HeikinAshiIndicator extends RecursiveCachedIndicator<Bar> {
         Num lowPrice = bar.getLowPrice();
         Num closePrice = bar.getClosePrice();
 
-        Num haOpenPrice = prevHaBar.getOpenPrice().plus(prevHaBar.getClosePrice()).dividedBy(
-                getBarSeries().numFactory().numOf(2));
-        Num haClosePrice = openPrice.plus(highPrice).plus(lowPrice).plus(closePrice).dividedBy(
-                getBarSeries().numFactory().numOf(4));
+        NumFactory numFactory = getBarSeries().numFactory();
+        Num haClosePrice = openPrice.plus(highPrice).plus(lowPrice).plus(closePrice).dividedBy(numFactory.numOf(4));
+
+        // Pine: haOpen = na(haOpen[1]) ? (open + close) / 2 : (haOpen[1] + haClose[1]) / 2
+        // Reseeding after a NaN bar keeps NaN input (e.g. EMA warm-up) from poisoning all later bars.
+        Num seedOpen = openPrice;
+        Num seedClose = closePrice;
+        if (index > 0) {
+            Bar prevHaBar = getValue(index - 1);
+            if (Num.isFinite(prevHaBar.getOpenPrice()) && Num.isFinite(prevHaBar.getClosePrice())) {
+                seedOpen = prevHaBar.getOpenPrice();
+                seedClose = prevHaBar.getClosePrice();
+            }
+        }
+        Num haOpenPrice = seedOpen.plus(seedClose).dividedBy(numFactory.numOf(2));
         Num haHighPrice = highPrice.max(haClosePrice).max(haOpenPrice);
         Num haLowPrice = lowPrice.min(haClosePrice).min(haOpenPrice);
 
