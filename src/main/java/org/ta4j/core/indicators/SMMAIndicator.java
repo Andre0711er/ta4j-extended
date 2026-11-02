@@ -17,15 +17,25 @@ public class SMMAIndicator extends RecursiveCachedIndicator<Num> {
     }
 
     @Override protected Num calculate(int index) {
-        if (index == 0) {
-            return indicator.getValue(0);
+        Num current = indicator.getValue(index);
+
+        if (index == 0 || !Num.isFinite(current)) {
+            return current;
         }
 
-        return getValue(index - 1).multipliedBy(getBarSeries().numFactory().numOf(barCount - 1)).plus(
-                indicator.getValue(index)).dividedBy(getBarSeries().numFactory().numOf(barCount));
+        Num previous = getValue(index - 1);
+
+        // Restart from the current value after a NaN, e.g. an EMA input still in its warm-up phase.
+        // Otherwise a single NaN would poison every following value.
+        if (!Num.isFinite(previous)) {
+            return current;
+        }
+
+        return previous.multipliedBy(getBarSeries().numFactory().numOf(barCount - 1)).plus(current).dividedBy(
+                getBarSeries().numFactory().numOf(barCount));
     }
 
     @Override public int getCountOfUnstableBars() {
-        return barCount;
+        return indicator.getCountOfUnstableBars() + barCount;
     }
 }

@@ -28,7 +28,8 @@ public class ASOIndicator extends AbstractIndicator<Num> {
         BinaryOperationIndicator intrarange = BinaryOperationIndicator.difference(new HighPriceIndicator(series), low);
         LowestValueIndicator grouplow = new LowestValueIndicator(low, barCount);
         HighestValueIndicator grouphigh = new HighestValueIndicator(high, barCount);
-        PreviousValueIndicator groupopen = new PreviousValueIndicator(open, barCount - 1);
+        // Pine: open[length - 1]; PreviousValueIndicator rejects n = 0, so use open directly for length 1
+        Indicator<Num> groupopen = barCount > 1 ? new PreviousValueIndicator(open, barCount - 1) : open;
         BinaryOperationIndicator grouprange = BinaryOperationIndicator.difference(grouphigh, grouplow);
         SubstituteIndicator k1 = new SubstituteIndicator(intrarange, 0, 1);
         SubstituteIndicator k2 = new SubstituteIndicator(grouprange, 0, 1);
@@ -38,7 +39,7 @@ public class ASOIndicator extends AbstractIndicator<Num> {
         BinaryOperationIndicator intrabarbulls = BinaryOperationIndicator.quotient(BinaryOperationIndicator.product(intrabaravg, 100), k1);
         AverageIndicator groupavg = new AverageIndicator(BinaryOperationIndicator.difference(close, grouplow),
                 BinaryOperationIndicator.difference(grouphigh, groupopen));
-        BinaryOperationIndicator groupbulls = BinaryOperationIndicator.difference(BinaryOperationIndicator.product(groupavg, 100), k2);
+        BinaryOperationIndicator groupbulls = BinaryOperationIndicator.quotient(BinaryOperationIndicator.product(groupavg, 100), k2);
 
         this.asoIndicator = new SMAIndicator(new AverageIndicator(intrabarbulls, groupbulls), barCount);
     }
