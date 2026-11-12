@@ -5,8 +5,9 @@ import org.ta4j.core.indicators.averages.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
 import org.ta4j.core.indicators.numeric.BinaryOperationIndicator;
-import org.ta4j.core.indicators.numeric.UnaryOperationIndicator;
+import org.ta4j.core.num.NaN;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.num.NumFactory;
 
 /**
  * Simple Hurst Exponent indicator by QuantNomad.
@@ -32,29 +33,32 @@ public class HurstExponentIndicator extends CachedIndicator<Num> {
 
     @Override
     protected Num calculate(int index) {
-        BinaryOperationIndicator distanceFromMean = BinaryOperationIndicator.difference(pnl, meanPnl.getValue(index).doubleValue());
-        UnaryOperationIndicator distanceFromMeanPow = UnaryOperationIndicator.pow(distanceFromMean, 2);
+        NumFactory numFactory = getBarSeries().numFactory();
+        Num mean = meanPnl.getValue(index);
+        int from = index - barCount + 1;
 
-        Num cum = getBarSeries().numFactory().zero();
-        Num cumMin = getBarSeries().numFactory().numOf(Double.MAX_VALUE);
-        Num cumMax = getBarSeries().numFactory().numOf(Double.MIN_VALUE);
+        // pnl needs a previous close, so the first full window starts at bar 1
+        if (from < 1 || mean.isNaN()) {
+            return NaN.NaN;
+        }
 
-        for (int i = Math.max(0, index - barCount + 1); i <= index; i++) {
-            cum = cum.plus(distanceFromMean.getValue(i));
+        Num cum = numFactory.zero();
+        Num cumMin = numFactory.numOf(Double.MAX_VALUE);
+        Num cumMax = numFactory.numOf(Double.MIN_VALUE);
+        Num devSum = numFactory.zero();
+
+        for (int i = from; i <= index; i++) {
+            Num distanceFromMean = pnl.getValue(i).minus(mean);
+            cum = cum.plus(distanceFromMean);
             cumMin = cumMin.min(cum);
             cumMax = cumMax.max(cum);
+            devSum = devSum.plus(distanceFromMean.multipliedBy(distanceFromMean));
         }
 
-        Num devSum = getBarSeries().numFactory().zero();
-
-        for (int i = Math.max(0, index - barCount + 1); i <= index; i++) {
-            devSum = devSum.plus(distanceFromMeanPow.getValue(i));
-        }
-
-        Num sd = devSum.dividedBy(getBarSeries().numFactory().numOf(barCount - 1)).sqrt();
+        Num sd = devSum.dividedBy(numFactory.numOf(barCount - 1)).sqrt();
         Num rs = cumMax.minus(cumMin).dividedBy(sd);
 
-        return rs.log().dividedBy(getBarSeries().numFactory().numOf(barCount).log());
+        return rs.log().dividedBy(numFactory.numOf(barCount).log());
     }
 
     @Override

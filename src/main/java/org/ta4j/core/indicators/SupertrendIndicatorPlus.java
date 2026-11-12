@@ -55,6 +55,11 @@ public class SupertrendIndicatorPlus extends RecursiveCachedIndicator<Num> {
         }
 
         Num prevValue = getValue(index - 1);
+        if (prevValue.isNaN()) {
+            // the ATR is still warming up (MMA/EMA return NaN for their unstable bars): seed like at index 0
+            return lowerAtrBandIndicator.getValue(index);
+        }
+
         Num prevClosePrice = closePriceIndicator.getValue(index - 1);
         Num closePrice = closePriceIndicator.getValue(index);
         Num upperAtrBandValue = upperAtrBandIndicator.getValue(index);
