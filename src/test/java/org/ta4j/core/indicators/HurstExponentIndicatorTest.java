@@ -1,6 +1,7 @@
 package org.ta4j.core.indicators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -46,6 +47,12 @@ public class HurstExponentIndicatorTest extends AbstractIndicatorTest<Indicator<
         for (int index : new int[] { BAR_COUNT, 200, data.getEndIndex() }) {
             assertEquals(reference(index), hurst.getValue(index).doubleValue(), 1e-9, "index " + index);
         }
+    }
+
+    @Test
+    public void rejectsBarCountBelowTwo() {
+        assertThrows(IllegalArgumentException.class, () -> new HurstExponentIndicator(data, 1));
+        assertThrows(IllegalArgumentException.class, () -> new HurstExponentIndicator(data, 0));
     }
 
     /**

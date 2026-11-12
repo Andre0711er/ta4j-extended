@@ -68,11 +68,11 @@ public class SupertrendIndicatorPlus extends RecursiveCachedIndicator<Num> {
         if (prevValue.isLessThan(prevClosePrice)) { // green, band below price
             Num value = prevValue.max(lowerAtrBandValue);
             return value.isLessThan(closePrice) ? value : upperAtrBandValue;
-        } else if (prevValue.isGreaterThan(prevClosePrice)) { // red, band above price
+        } else {
+            // red, band above price; also taken when the band touched the close (ATR 0 on flat bars, both bands equal
+            // the close) or the previous close is NaN
             Num value = prevValue.min(upperAtrBandValue);
             return value.isGreaterThan(closePrice) ? value : lowerAtrBandValue;
-        } else {
-            throw new IllegalArgumentException("Previous value equals previous close price, this shouldn't happen");
         }
     }
 

@@ -1,6 +1,7 @@
 package org.ta4j.core.indicators;
 
 import org.ta4j.core.BarSeries;
+import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.averages.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
@@ -14,9 +15,11 @@ import org.ta4j.core.num.NumFactory;
  * <a href="https://www.tradingview.com/script/v267CGzx-Simple-Hurst-Exponent-QuantNomad/">TradingView</a>
  */
 public class HurstExponentIndicator extends CachedIndicator<Num> {
-    private final BinaryOperationIndicator pnl;
+    private final Indicator<Num> pnl;
     private final SMAIndicator meanPnl;
     private final int barCount;
+    private final Num barCountMinusOne;
+    private final Num logBarCount;
 
     public HurstExponentIndicator(BarSeries series, int barCount) {
         this(new ClosePriceIndicator(series), barCount);
@@ -25,10 +28,18 @@ public class HurstExponentIndicator extends CachedIndicator<Num> {
     public HurstExponentIndicator(ClosePriceIndicator indicator, int barCount) {
         super(indicator.getBarSeries());
 
-        this.pnl = BinaryOperationIndicator.difference(BinaryOperationIndicator.quotient(indicator, new PreviousValueIndicator(indicator)),
-                1);
+        if (barCount < 2) {
+            throw new IllegalArgumentException("barCount must be at least 2, was " + barCount);
+        }
+
+        this.pnl = new PnlIndicator(BinaryOperationIndicator.difference(
+                BinaryOperationIndicator.quotient(indicator, new PreviousValueIndicator(indicator)), 1));
         this.meanPnl = new SMAIndicator(pnl, barCount);
         this.barCount = barCount;
+
+        NumFactory numFactory = getBarSeries().numFactory();
+        this.barCountMinusOne = numFactory.numOf(barCount - 1);
+        this.logBarCount = numFactory.numOf(barCount).log();
     }
 
     @Override
@@ -55,14 +66,34 @@ public class HurstExponentIndicator extends CachedIndicator<Num> {
             devSum = devSum.plus(distanceFromMean.multipliedBy(distanceFromMean));
         }
 
-        Num sd = devSum.dividedBy(numFactory.numOf(barCount - 1)).sqrt();
+        Num sd = devSum.dividedBy(barCountMinusOne).sqrt();
         Num rs = cumMax.minus(cumMin).dividedBy(sd);
 
-        return rs.log().dividedBy(numFactory.numOf(barCount).log());
+        return rs.log().dividedBy(logBarCount);
     }
 
     @Override
     public int getCountOfUnstableBars() {
         return barCount;
+    }
+
+    /** Caches the per-bar pnl, which every window of {@code barCount} bars reads again. */
+    private static final class PnlIndicator extends CachedIndicator<Num> {
+        private final Indicator<Num> source;
+
+        private PnlIndicator(Indicator<Num> source) {
+            super(source);
+            this.source = source;
+        }
+
+        @Override
+        protected Num calculate(int index) {
+            return source.getValue(index);
+        }
+
+        @Override
+        public int getCountOfUnstableBars() {
+            return source.getCountOfUnstableBars();
+        }
     }
 }
